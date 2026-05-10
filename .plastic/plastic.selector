@@ -1,0 +1,4 @@
+repository "pickmeup kimi/pickmeup kimi@11270640882113@cloud"
+  path "/"
+    br "/main"
+    co "/main"
