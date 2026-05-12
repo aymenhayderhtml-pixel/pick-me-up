@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pick Me Up — Hero Roster</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-bright: #e8c96a;
+            --gold-dim: #7a5f28;
+            --gold-glow: rgba(201, 168, 76, 0.3);
+            --star5: #ffd700;
+            --star4: #c080ff;
+            --star3: #60a0ff;
+            --star2: #60ff80;
+            --star1: #aaaaaa;
+            --purple: #9b30ff;
+            --red: #cc2222;
+            --dark: #06060e;
+            --panel: rgba(8, 6, 18, 0.82);
+            --panel-solid: rgba(10, 8, 22, 0.95);
+            --border: rgba(201, 168, 76, 0.25);
+            --border-bright: rgba(201, 168, 76, 0.6);
+            --text: #e8e0d0;
+            --text-muted: #7a6f5a;
+            --tf: 0.15s ease;
+            --tn: 0.25s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--dark);
+            color: var(--text);
+            font-family: 'Crimson Text', serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-dim);
+            border-radius: 2px;
+        }
+
+        /* ── BG ── */
+        .global-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: url('images/summon-bg.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .global-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(4, 4, 14, 0.72);
+        }
+
+        /* ── ROOT ── */
+        .root {
+            position: relative;
+            z-index: 1;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ══════════════════════════════
+   TOP BAR
+══════════════════════════════ */
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0 20px;
+            height: 60px;
+            flex-shrink: 0;
+            background: linear-gradient(180deg, rgba(4, 4, 14, 0.96) 0%, rgba(4, 4, 14, 0.75) 100%);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--tf);
+            flex-shrink: 0;
+        }
+
+        .back-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            transform: translateX(-2px);
+        }
+
+        .back-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .topbar-title {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .topbar-title::before,
+        .topbar-title::after {
+            content: '◆';
+            font-size: 8px;
+            color: var(--gold-dim);
+        }
+
+        .hero-count {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            margin-left: 4px;
+        }
+
+        .hero-count span {
+            color: var(--gold);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        /* Capacity bar */
+        .capacity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cap-label {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .cap-bar {
+            width: 100px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+        }
+
+        .cap-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+            width: 56%;
+        }
+
+        .cap-text {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            color: var(--gold);
+        }
+
+        /* ══════════════════════════════
+   FILTER / SORT BAR
+══════════════════════════════ */
+        .filterbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            flex-shrink: 0;
+            background: rgba(4, 4, 14, 0.65);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Search */
+        .search-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            letter-spacing: 1px;
+            padding: 7px 12px 7px 32px;
+            width: 180px;
+            outline: none;
+            transition: border-color var(--tf);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-input:focus {
+            border-color: var(--gold);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .search-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Filter pills */
+        .filter-group {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            margin-right: 2px;
+        }
+
+        .pill {
+            padding: 5px 11px;
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--tf);
+            white-space: nowrap;
+        }
+
+        .pill:hover {
+            border-color: var(--border-bright);
+            color: var(--text);
+        }
+
+        .pill.active {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        .pill.star5-pill.active {
+            border-color: var(--star5);
+            color: var(--star5);
+            background: rgba(255, 215, 0, 0.08);
+        }
+
+        .pill.star4-pill.active {
+            border-color: var(--star4);
+            color: var(--star4);
+            background: rgba(192, 128, 255, 0.08);
+        }
+
+        .pill.star3-pill.active {
+            border-color: var(--star3);
+            color: var(--star3);
+            background: rgba(96, 160, 255, 0.08);
+        }
+
+        .pill.star2-pill.active {
+            border-color: var(--star2);
+            color: var(--star2);
+            background: rgba(96, 255, 128, 0.08);
+        }
+
+        .pill.star1-pill.active {
+            border-color: var(--star1);
+            color: var(--star1);
+            background: rgba(170, 170, 170, 0.08);
+        }
+
+        .divider-v {
+            width: 1px;
+            height: 22px;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        /* Sort select */
+        .sort-select {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 1px;
+            padding: 6px 10px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color var(--tf);
+        }
+
+        .sort-select:focus,
+        .sort-select:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .sort-select option {
+            background: #0a0816;
+        }
+
+        /* View toggle */
+        .view-toggle {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        .view-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--tf);
+        }
+
+        .view-btn:hover,
+        .view-btn.active {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(201, 168, 76, 0.08);
+        }
+
+        .view-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ══════════════════════════════
+   MAIN CONTENT
+══════════════════════════════ */
+        .content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* ── ROSTER GRID ── */
+        .roster-area {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px 18px;
+        }
+
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+            gap: 12px;
+        }
+
+        .roster-grid.list-view {
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        /* ── HERO CARD ── */
+        .hero-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            backdrop-filter: blur(6px);
+            cursor: pointer;
+            transition: all var(--tn);
+            animation: fadeSlideIn 0.3s ease backwards;
+        }
+
+        .hero-card:hover {
+            border-color: var(--gold-bright);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 16px rgba(201, 168, 76, 0.12);
+            z-index: 2;
+        }
+
+        .hero-card.selected {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.4), 0 8px 28px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Corner ornaments */
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 10px;
+            height: 10px;
+            border-top: 2px solid var(--gold);
+            border-left: 2px solid var(--gold);
+            z-index: 4;
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            right: -1px;
+            width: 10px;
+            height: 10px;
+            border-bottom: 2px solid var(--gold);
+            border-right: 2px solid var(--gold);
+            z-index: 4;
+        }
+
+        /* Rarity color top strip */
+        .card-rarity-strip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 3;
+        }
+
+        .star5 .card-rarity-strip {
+            background: linear-gradient(90deg, transparent, var(--star5), transparent);
+            box-shadow: 0 0 8px var(--star5);
+        }
+
+        .star4 .card-rarity-strip {
+            background: linear-gradient(90deg, transparent, var(--star4), transparent);
+            box-shadow: 0 0 8px var(--star4);
+        }
+
+        .star3 .card-rarity-strip {
+            background: linear-gradient(90deg, transparent, var(--star3), transparent);
+            box-shadow: 0 0 8px var(--star3);
+        }
+
+        .star2 .card-rarity-strip {
+            background: linear-gradient(90deg, transparent, var(--star2), transparent);
+        }
+
+        .star1 .card-rarity-strip {
+            background: linear-gradient(90deg, transparent, var(--star1), transparent);
+        }
+
+        /* Portrait */
+        .card-portrait {
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+            background: #0c0818;
+        }
+
+        .card-portrait img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+            filter: brightness(0.9);
+        }
+
+        .hero-card:hover .card-portrait img {
+            transform: scale(1.06);
+            filter: brightness(1.05);
+        }
+
+        .portrait-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            opacity: 0.3;
+        }
+
+        /* Portrait overlays */
+        .card-portrait-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(4, 2, 14, 0.9) 100%);
+        }
+
+        /* Leader badge */
+        .leader-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            z-index: 5;
+            background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+            color: var(--dark);
+            font-family: 'Cinzel', serif;
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 2px 6px;
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        /* Dead overlay */
+        .dead-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 6;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .dead-skull {
+            font-size: 32px;
+            filter: grayscale(1);
+        }
+
+        .dead-text {
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            color: #cc2222;
+            letter-spacing: 2px;
+        }
+
+        /* Card info */
+        .card-info {
+            padding: 8px 10px 10px;
+        }
+
+        .card-name {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: #f0e0b0;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 3px;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-stars {
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        .card-level {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .card-power {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            color: var(--gold);
+            margin-top: 2px;
+        }
+
+        .card-class-badge {
+            position: absolute;
+            bottom: 42px;
+            right: 6px;
+            z-index: 4;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1px solid rgba(201, 168, 76, 0.4);
+            background: rgba(4, 2, 14, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+
+        /* Shimmer on 5★ */
+        .star5 .card-portrait::after {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255, 215, 0, 0.12) 50%, transparent 60%);
+            animation: shimmer 3s linear infinite;
+            pointer-events: none;
+        }
+
+        /* ── LIST VIEW CARD ── */
+        .roster-grid.list-view .hero-card {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            height: 72px;
+        }
+
+        .roster-grid.list-view .card-portrait {
+            width: 60px;
+            height: 72px;
+            flex-shrink: 0;
+        }
+
+        .roster-grid.list-view .card-portrait img {
+            height: 72px;
+        }
+
+        .roster-grid.list-view .card-portrait-overlay {
+            display: none;
+        }
+
+        .roster-grid.list-view .card-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            padding: 8px 12px;
+        }
+
+        .roster-grid.list-view .card-name {
+            flex: 1.4;
+            margin-bottom: 0;
+            font-size: 12px;
+        }
+
+        .roster-grid.list-view .card-stars {
+            flex: 1;
+            font-size: 11px;
+        }
+
+        .roster-grid.list-view .card-meta-row {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .roster-grid.list-view .card-class-badge {
+            position: static;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .roster-grid.list-view .card-power {
+            margin-top: 0;
+        }
+
+        .roster-grid.list-view .card-rarity-strip {
+            top: 0;
+            left: 0;
+            right: auto;
+            bottom: 0;
+            width: 2px;
+            height: auto;
+        }
+
+        .roster-grid.list-view .hero-card::before {
+            display: none;
+        }
+
+        .roster-grid.list-view .hero-card::after {
+            display: none;
+        }
+
+        /* ── EMPTY / LOCKED SLOT ── */
+        .hero-card.locked {
+            cursor: default;
+            opacity: 0.35;
+            background: rgba(4, 4, 14, 0.4);
+        }
+
+        .hero-card.locked:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: var(--border);
+        }
+
+        .locked-inner {
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: var(--text-muted);
+        }
+
+        .locked-icon {
+            font-size: 28px;
+            opacity: 0.4;
+        }
+
+        .locked-text {
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            letter-spacing: 2px;
+        }
+
+        /* ══════════════════════════════
+   DETAIL PANEL (slide in from right)
+══════════════════════════════ */
+        .detail-panel {
+            width: 0;
+            flex-shrink: 0;
+            overflow: hidden;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 0px solid var(--border);
+            background: var(--panel-solid);
+            backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-panel.open {
+            width: 300px;
+            border-left: 1px solid var(--border);
+        }
+
+        .detail-inner {
+            width: 300px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        /* Close btn */
+        .detail-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all var(--tf);
+            z-index: 5;
+        }
+
+        .detail-close:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        /* Hero portrait large */
+        .detail-portrait {
+            width: 100%;
+            height: 260px;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .detail-portrait img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+            filter: brightness(0.88);
+        }
+
+        .detail-portrait-fallback {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a0a30, #0a0618);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            opacity: 0.2;
+        }
+
+        .detail-portrait-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(4, 2, 18, 0.95) 100%);
+        }
+
+        .detail-rarity-glow {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            opacity: 0.4;
+        }
+
+        .detail-name-block {
+            position: absolute;
+            bottom: 14px;
+            left: 16px;
+            right: 16px;
+            z-index: 2;
+        }
+
+        .detail-name {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #f0e0b0;
+            letter-spacing: 0.05em;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+            margin-bottom: 4px;
+        }
+
+        .detail-stars {
+            font-size: 16px;
+            letter-spacing: 3px;
+        }
+
+        .detail-class-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .detail-class {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--gold);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2px 8px;
+            border: 1px solid var(--gold-dim);
+        }
+
+        /* Detail body */
+        .detail-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            flex: 1;
+        }
+
+        /* Level / exp */
+        .detail-section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-level-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .detail-level {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            color: var(--gold);
+        }
+
+        .detail-exp-bar {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+        }
+
+        .detail-exp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+            transition: width 0.6s ease;
+        }
+
+        /* Stats */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border);
+            padding: 7px 10px;
+        }
+
+        .stat-box-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .stat-box-val {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            color: #f0e0b0;
+            font-weight: 600;
+        }
+
+        /* Skills */
+        .skill-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .skill-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            padding: 8px 10px;
+        }
+
+        .skill-icon {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            background: rgba(201, 168, 76, 0.1);
+            border: 1px solid var(--gold-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .skill-name {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            color: var(--gold);
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .skill-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Action buttons */
+        .detail-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding: 0 16px 16px;
+        }
+
+        .action-btn {
+            padding: 11px 16px;
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            letter-spacing: 2px;
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--tf);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .action-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .action-btn.primary {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(201, 168, 76, 0.08);
+        }
+
+        .action-btn.primary:hover {
+            background: rgba(201, 168, 76, 0.18);
+            box-shadow: 0 0 20px rgba(201, 168, 76, 0.15);
+        }
+
+        .action-btn.danger {
+            border-color: #8b2222;
+            color: #cc4444;
+        }
+
+        .action-btn.danger:hover {
+            background: rgba(200, 30, 30, 0.12);
+            border-color: #cc2222;
+        }
+
+        .action-btn:hover {
+            border-color: var(--border-bright);
+            color: var(--text);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ══════════════════════════════
+   ANIMATIONS
+══════════════════════════════ */
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) rotate(45deg)
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg)
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.7
+            }
+
+            50% {
+                opacity: 1
+            }
+        }
+
+        /* Stagger cards */
+        .hero-card:nth-child(1) {
+            animation-delay: 0.02s
+        }
+
+        .hero-card:nth-child(2) {
+            animation-delay: 0.04s
+        }
+
+        .hero-card:nth-child(3) {
+            animation-delay: 0.06s
+        }
+
+        .hero-card:nth-child(4) {
+            animation-delay: 0.08s
+        }
+
+        .hero-card:nth-child(5) {
+            animation-delay: 0.10s
+        }
+
+        .hero-card:nth-child(6) {
+            animation-delay: 0.12s
+        }
+
+        .hero-card:nth-child(7) {
+            animation-delay: 0.14s
+        }
+
+        .hero-card:nth-child(8) {
+            animation-delay: 0.16s
+        }
+
+        .hero-card:nth-child(9) {
+            animation-delay: 0.18s
+        }
+
+        .hero-card:nth-child(10) {
+            animation-delay: 0.20s
+        }
+
+        .hero-card:nth-child(n+11) {
+            animation-delay: 0.22s
+        }
+
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            gap: 12px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            opacity: 0.2;
+        }
+
+        .empty-text {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            letter-spacing: 3px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="global-bg"></div>
+
+    <div class="root">
+
+        <!-- ══ TOP BAR ══ -->
+        <header class="topbar">
+            <div class="back-btn" onclick="window.location.href='lobby.html'">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                </svg>
+            </div>
+            <div class="topbar-title">Hero Roster</div>
+            <div class="hero-count">(<span id="heroCountDisplay">0</span> heroes)</div>
+            <div class="topbar-right">
+                <div class="capacity">
+                    <div class="cap-label">CAPACITY</div>
+                    <div class="cap-bar">
+                        <div class="cap-fill" id="capFill"></div>
+                    </div>
+                    <div class="cap-text" id="capText">0/50</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ══ FILTER BAR ══ -->
+        <div class="filterbar">
+            <!-- Search -->
+            <div class="search-wrap">
+                <div class="search-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                </div>
+                <input class="search-input" type="text" placeholder="SEARCH HERO..." id="searchInput"
+                    oninput="applyFilters()">
+            </div>
+
+            <div class="divider-v"></div>
+
+            <!-- Rarity filter -->
+            <div class="filter-group">
+                <div class="filter-label">RARITY</div>
+                <div class="pill active" data-rarity="all" onclick="setRarityFilter('all',this)">ALL</div>
+                <div class="pill star5-pill" data-rarity="5" onclick="setRarityFilter('5',this)">5★</div>
+                <div class="pill star4-pill" data-rarity="4" onclick="setRarityFilter('4',this)">4★</div>
+                <div class="pill star3-pill" data-rarity="3" onclick="setRarityFilter('3',this)">3★</div>
+                <div class="pill star2-pill" data-rarity="2" onclick="setRarityFilter('2',this)">2★</div>
+                <div class="pill star1-pill" data-rarity="1" onclick="setRarityFilter('1',this)">1★</div>
+            </div>
+
+            <div class="divider-v"></div>
+
+            <!-- Class filter -->
+            <div class="filter-group">
+                <div class="filter-label">CLASS</div>
+                <div class="pill active" data-class="all" onclick="setClassFilter('all',this)">ALL</div>
+                <div class="pill" data-class="Warrior" onclick="setClassFilter('Warrior',this)">⚔ WAR</div>
+                <div class="pill" data-class="Mage" onclick="setClassFilter('Mage',this)">🔮 MAGE</div>
+                <div class="pill" data-class="Assassin" onclick="setClassFilter('Assassin',this)">🗡 ASS</div>
+                <div class="pill" data-class="Support" onclick="setClassFilter('Support',this)">🛡 SUP</div>
+                <div class="pill" data-class="Archer" onclick="setClassFilter('Archer',this)">🏹 ARC</div>
+            </div>
+
+            <div class="divider-v"></div>
+
+            <!-- Sort -->
+            <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+                <option value="rarity">SORT: RARITY</option>
+                <option value="power">SORT: POWER</option>
+                <option value="level">SORT: LEVEL</option>
+                <option value="name">SORT: NAME</option>
+                <option value="acquired">SORT: ACQUIRED</option>
+            </select>
+
+            <!-- View toggle -->
+            <div class="view-toggle">
+                <div class="view-btn active" id="gridViewBtn" onclick="setView('grid')" title="Grid View">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                    </svg>
+                </div>
+                <div class="view-btn" id="listViewBtn" onclick="setView('list')" title="List View">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="3" y="5" width="18" height="2" />
+                        <rect x="3" y="11" width="18" height="2" />
+                        <rect x="3" y="17" width="18" height="2" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ CONTENT ══ -->
+        <div class="content">
+
+            <!-- Roster grid -->
+            <div class="roster-area" id="rosterArea">
+                <div class="roster-grid" id="rosterGrid"></div>
+            </div>
+
+            <!-- Detail panel -->
+            <div class="detail-panel" id="detailPanel">
+                <div class="detail-inner" id="detailInner">
+                    <!-- filled by JS -->
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // ══════════════════════════════════════════
+        // HERO DATA — using your actual heros/ folder
+        // ══════════════════════════════════════════
+        var ALL_HEROES = [
+            // 5★
+            { id: 1, name: 'Demon Chef', img: 'heros/5★ Demon Chef.png', stars: 5, class: 'Support', level: 45, maxLevel: 60, exp: 72, power: 18420, skills: [{ icon: '🔥', name: 'Hellfire Feast', desc: 'Cooks a cursed meal that buffs all allies for 3 turns.' }, { icon: '🍖', name: 'Soul Banquet', desc: 'Sacrifices HP to grant massive ATK boost to party.' }], isLeader: false, isDead: false, acquiredAt: 1 },
+            { id: 2, name: 'Void Libraria', img: 'heros/5★ Void Libraria.png', stars: 5, class: 'Mage', level: 50, maxLevel: 60, exp: 88, power: 21340, skills: [{ icon: '📚', name: 'Tome of Void', desc: 'Seals one enemy skill for 2 turns.' }, { icon: '🌌', name: 'Endless Archive', desc: 'Reads fate — reveals next 3 enemy moves.' }], isLeader: true, isDead: false, acquiredAt: 2 },
+            // 4★
+            { id: 3, name: 'Archmage', img: 'heros/4★ Archmage.png', stars: 4, class: 'Mage', level: 38, maxLevel: 50, exp: 55, power: 12800, skills: [{ icon: '⚡', name: 'Chain Lightning', desc: 'Hits all enemies with arcing lightning.' }, { icon: '🔵', name: 'Mana Surge', desc: 'Temporarily doubles spell damage.' }], isLeader: false, isDead: false, acquiredAt: 3 },
+            { id: 4, name: 'Paladin', img: 'heros/4★ Paladin.png', stars: 4, class: 'Warrior', level: 40, maxLevel: 50, exp: 64, power: 13500, skills: [{ icon: '🛡', name: 'Holy Shield', desc: 'Blocks all damage for 1 turn.' }, { icon: '⚔', name: 'Divine Strike', desc: 'Deals heavy damage + heals self.' }], isLeader: false, isDead: false, acquiredAt: 4 },
+            { id: 5, name: 'Shadow Assassin', img: 'heros/4★ Shadow Assassin.png', stars: 4, class: 'Assassin', level: 35, maxLevel: 50, exp: 40, power: 11200, skills: [{ icon: '🗡', name: 'Shadow Step', desc: 'Teleports behind enemy for a critical hit.' }, { icon: '🌑', name: 'Death Mark', desc: 'Target takes 50% more damage for 2 turns.' }], isLeader: false, isDead: true, acquiredAt: 5 },
+            // 3★
+            { id: 6, name: 'Chef (Master)', img: 'heros/3★ Chef (Master).png', stars: 3, class: 'Support', level: 22, maxLevel: 40, exp: 30, power: 5400, skills: [{ icon: '🍳', name: 'Battle Stew', desc: 'Heals all allies for moderate HP.' }, { icon: '🔪', name: 'Cleaver Toss', desc: 'Throws a cleaver dealing physical damage.' }], isLeader: false, isDead: false, acquiredAt: 6 },
+            { id: 7, name: 'Knight', img: 'heros/3★ Knight.png', stars: 3, class: 'Warrior', level: 25, maxLevel: 40, exp: 45, power: 6100, skills: [{ icon: '⚔', name: 'Shield Bash', desc: 'Stuns enemy for 1 turn.' }, { icon: '🛡', name: 'Iron Will', desc: 'Reduces damage taken for 2 turns.' }], isLeader: false, isDead: false, acquiredAt: 7 },
+            { id: 8, name: 'Librarian (Arcane)', img: 'heros/3★ Librarian (Arcane).png', stars: 3, class: 'Mage', level: 20, maxLevel: 40, exp: 25, power: 4900, skills: [{ icon: '📖', name: 'Arcane Study', desc: 'Reads a spell granting random buff.' }, { icon: '✨', name: 'Glyph Trap', desc: 'Places a rune that explodes on enemy step.' }], isLeader: false, isDead: false, acquiredAt: 8 },
+            { id: 9, name: 'Mage', img: 'heros/3★ Mage.png', stars: 3, class: 'Mage', level: 18, maxLevel: 40, exp: 20, power: 4200, skills: [{ icon: '🔮', name: 'Fireball', desc: 'Basic fire spell dealing AoE damage.' }, { icon: '❄', name: 'Frost Nova', desc: 'Freezes enemies in an area.' }], isLeader: false, isDead: false, acquiredAt: 9 },
+            // 2★
+            { id: 10, name: 'Apprentice Mage', img: 'heros/2★ Apprentice Mage.png', stars: 2, class: 'Mage', level: 12, maxLevel: 30, exp: 40, power: 1800, skills: [{ icon: '💫', name: 'Magic Bolt', desc: 'Basic ranged magic attack.' }], isLeader: false, isDead: false, acquiredAt: 10 },
+            { id: 11, name: 'Cook (Skilled)', img: 'heros/2★ Cook (Skilled).png', stars: 2, class: 'Support', level: 10, maxLevel: 30, exp: 35, power: 1400, skills: [{ icon: '🥘', name: 'Hearty Meal', desc: 'Heals one ally for a small amount.' }], isLeader: false, isDead: false, acquiredAt: 11 },
+            { id: 12, name: 'Scout', img: 'heros/2★ Scout.png', stars: 2, class: 'Archer', level: 14, maxLevel: 30, exp: 50, power: 2100, skills: [{ icon: '👁', name: 'Eagle Eye', desc: 'Reveals hidden enemies and traps.' }], isLeader: false, isDead: false, acquiredAt: 12 },
+            // 1★
+            { id: 13, name: 'Beggar', img: 'heros/1★ Beggar.png', stars: 1, class: 'Support', level: 5, maxLevel: 20, exp: 20, power: 280, skills: [{ icon: '🪙', name: 'Plea', desc: 'Begs for mercy — sometimes works.' }], isLeader: false, isDead: false, acquiredAt: 13 },
+            { id: 14, name: 'Farmer', img: 'heros/1★ Farmer.png', stars: 1, class: 'Warrior', level: 6, maxLevel: 20, exp: 30, power: 320, skills: [{ icon: '🌾', name: 'Pitchfork', desc: 'Basic physical attack.' }], isLeader: false, isDead: false, acquiredAt: 14 },
+            { id: 15, name: 'Fisherman', img: 'heros/1★ Fisherman.png', stars: 1, class: 'Archer', level: 4, maxLevel: 20, exp: 15, power: 260, skills: [{ icon: '🎣', name: 'Net Throw', desc: 'Slows enemy movement speed.' }], isLeader: false, isDead: false, acquiredAt: 15 },
+            { id: 16, name: 'Grave Digger', img: 'heros/1★ Grave Digger.png', stars: 1, class: 'Warrior', level: 7, maxLevel: 20, exp: 40, power: 380, skills: [{ icon: '⚰', name: 'Shovel Smash', desc: 'Heavy but slow physical blow.' }], isLeader: false, isDead: false, acquiredAt: 16 },
+            { id: 17, name: 'Librarian', img: 'heros/1★ Librarian.png', stars: 1, class: 'Support', level: 3, maxLevel: 20, exp: 10, power: 200, skills: [{ icon: '📚', name: 'Read Aloud', desc: 'Buffs ally INT for 1 turn.' }], isLeader: false, isDead: false, acquiredAt: 17 },
+            { id: 18, name: 'Maid', img: 'heros/1★ Maid.png', stars: 1, class: 'Support', level: 5, maxLevel: 20, exp: 22, power: 240, skills: [{ icon: '🧹', name: 'Clean Sweep', desc: 'Removes one debuff from an ally.' }], isLeader: false, isDead: false, acquiredAt: 18 },
+            { id: 19, name: 'Merchant', img: 'heros/1★ Merchant.png', stars: 1, class: 'Support', level: 6, maxLevel: 20, exp: 28, power: 290, skills: [{ icon: '💰', name: 'Trade Deal', desc: 'Exchanges items mid-battle.' }], isLeader: false, isDead: false, acquiredAt: 19 },
+        ];
+
+        var TOTAL_SLOTS = 50;
+        var rarityFilter = 'all';
+        var classFilter = 'all';
+        var currentView = 'grid';
+        var selectedId = null;
+
+        var starColors = { 5: 'var(--star5)', 4: 'var(--star4)', 3: 'var(--star3)', 2: 'var(--star2)', 1: 'var(--star1)' };
+        var classIcons = { Warrior: '⚔', Mage: '🔮', Assassin: '🗡', Support: '🛡', Archer: '🏹' };
+
+        // ── INIT ──
+        window.addEventListener('DOMContentLoaded', function () {
+            updateCapacity();
+            applyFilters();
+        });
+
+        function updateCapacity() {
+            var alive = ALL_HEROES.filter(function (h) { return !h.isDead; }).length;
+            var pct = (alive / TOTAL_SLOTS) * 100;
+            document.getElementById('capFill').style.width = pct + '%';
+            document.getElementById('capText').textContent = alive + '/' + TOTAL_SLOTS;
+            document.getElementById('heroCountDisplay').textContent = ALL_HEROES.length;
+        }
+
+        // ── FILTERS ──
+        function setRarityFilter(val, el) {
+            rarityFilter = val;
+            document.querySelectorAll('[data-rarity]').forEach(function (p) { p.classList.remove('active'); });
+            el.classList.add('active');
+            applyFilters();
+        }
+        function setClassFilter(val, el) {
+            classFilter = val;
+            document.querySelectorAll('[data-class]').forEach(function (p) { p.classList.remove('active'); });
+            el.classList.add('active');
+            applyFilters();
+        }
+        function setView(v) {
+            currentView = v;
+            document.getElementById('gridViewBtn').classList.toggle('active', v === 'grid');
+            document.getElementById('listViewBtn').classList.toggle('active', v === 'list');
+            var grid = document.getElementById('rosterGrid');
+            grid.classList.toggle('list-view', v === 'list');
+        }
+
+        function applyFilters() {
+            var search = document.getElementById('searchInput').value.toLowerCase();
+            var sortVal = document.getElementById('sortSelect').value;
+
+            var filtered = ALL_HEROES.filter(function (h) {
+                var matchRarity = rarityFilter === 'all' || h.stars == rarityFilter;
+                var matchClass = classFilter === 'all' || h.class === classFilter;
+                var matchSearch = !search || h.name.toLowerCase().indexOf(search) !== -1;
+                return matchRarity && matchClass && matchSearch;
+            });
+
+            // Sort
+            filtered.sort(function (a, b) {
+                if (sortVal === 'rarity') return b.stars - a.stars || b.power - a.power;
+                if (sortVal === 'power') return b.power - a.power;
+                if (sortVal === 'level') return b.level - a.level;
+                if (sortVal === 'name') return a.name.localeCompare(b.name);
+                if (sortVal === 'acquired') return a.acquiredAt - b.acquiredAt;
+                return 0;
+            });
+
+            renderGrid(filtered);
+        }
+
+        // ── RENDER ──
+        function renderGrid(heroes) {
+            var grid = document.getElementById('rosterGrid');
+            grid.innerHTML = '';
+
+            if (heroes.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⚔</div><div class="empty-text">NO HEROES FOUND</div></div>';
+                return;
+            }
+
+            heroes.forEach(function (hero) {
+                grid.appendChild(createCard(hero));
+            });
+
+            // Add locked empty slots (only in 'all' filter, grid view)
+            if (rarityFilter === 'all' && classFilter === 'all' && currentView === 'grid') {
+                var remaining = TOTAL_SLOTS - ALL_HEROES.length;
+                for (var i = 0; i < Math.min(remaining, 8); i++) {
+                    grid.appendChild(createLockedSlot());
+                }
+            }
+        }
+
+        function createCard(hero) {
+            var card = document.createElement('div');
+            card.className = 'hero-card star' + hero.stars + (hero.isDead ? ' dead' : '') + (selectedId === hero.id ? ' selected' : '');
+            card.onclick = (function (h) { return function () { selectHero(h); }; })(hero);
+
+            // Rarity strip
+            var strip = document.createElement('div');
+            strip.className = 'card-rarity-strip';
+            card.appendChild(strip);
+
+            // Leader badge
+            if (hero.isLeader) {
+                var lb = document.createElement('div');
+                lb.className = 'leader-badge';
+                lb.textContent = 'LEADER';
+                card.appendChild(lb);
+            }
+
+            // Portrait
+            var portrait = document.createElement('div');
+            portrait.className = 'card-portrait';
+
+            var img = document.createElement('img');
+            img.src = hero.img; img.alt = hero.name;
+            img.onerror = function () {
+                this.style.display = 'none';
+                var fb = document.createElement('div');
+                fb.className = 'portrait-fallback';
+                fb.textContent = classIcons[hero.class] || '⚔';
+                portrait.appendChild(fb);
+            };
+            portrait.appendChild(img);
+
+            var overlay = document.createElement('div');
+            overlay.className = 'card-portrait-overlay';
+            portrait.appendChild(overlay);
+
+            // Dead overlay
+            if (hero.isDead) {
+                var deadOv = document.createElement('div');
+                deadOv.className = 'dead-overlay';
+                deadOv.innerHTML = '<div class="dead-skull">💀</div><div class="dead-text">FALLEN</div>';
+                portrait.appendChild(deadOv);
+            }
+
+            card.appendChild(portrait);
+
+            // Class badge
+            var classBadge = document.createElement('div');
+            classBadge.className = 'card-class-badge';
+            classBadge.textContent = classIcons[hero.class] || '?';
+            card.appendChild(classBadge);
+
+            // Info
+            var info = document.createElement('div');
+            info.className = 'card-info';
+
+            if (currentView === 'list') {
+                // List layout — name, stars, class badge, power in a row
+                info.innerHTML =
+                    '<div class="card-name">' + hero.name + '</div>' +
+                    '<div class="card-stars" style="color:' + starColors[hero.stars] + '">' + '★'.repeat(hero.stars) + '</div>' +
+                    '<div class="card-meta-row">' +
+                    '<div class="card-level">Lv.' + hero.level + '</div>' +
+                    '<div class="card-power">⚡ ' + hero.power.toLocaleString() + '</div>' +
+                    '</div>';
+            } else {
+                info.innerHTML =
+                    '<div class="card-name">' + hero.name + '</div>' +
+                    '<div class="card-meta">' +
+                    '<div class="card-stars" style="color:' + starColors[hero.stars] + '">' + '★'.repeat(hero.stars) + '</div>' +
+                    '<div class="card-level">Lv.' + hero.level + '</div>' +
+                    '</div>' +
+                    '<div class="card-power">⚡ ' + hero.power.toLocaleString() + '</div>';
+            }
+            card.appendChild(info);
+
+            return card;
+        }
+
+        function createLockedSlot() {
+            var card = document.createElement('div');
+            card.className = 'hero-card locked';
+            card.innerHTML = '<div class="locked-inner"><div class="locked-icon">🔒</div><div class="locked-text">EMPTY SLOT</div></div>';
+            return card;
+        }
+
+        // ── SELECT HERO → DETAIL PANEL ──
+        function selectHero(hero) {
+            selectedId = hero.id;
+            // Refresh grid to update selected state
+            applyFilters();
+
+            var panel = document.getElementById('detailPanel');
+            var inner = document.getElementById('detailInner');
+            panel.classList.add('open');
+
+            var sc = starColors[hero.stars];
+            var expPct = hero.exp + '%';
+
+            inner.innerHTML =
+                // Portrait
+                '<div class="detail-portrait" style="position:relative">' +
+                '<div class="detail-close" onclick="closeDetail()">✕</div>' +
+                '<img src="' + hero.img + '" alt="' + hero.name + '" onerror="this.style.display=\'none\'">' +
+                '<div class="detail-portrait-overlay"></div>' +
+                '<div class="detail-rarity-glow" style="background:radial-gradient(ellipse 80% 60% at 50% 100%,' + sc + ',transparent)"></div>' +
+                '<div class="detail-name-block">' +
+                '<div class="detail-name">' + hero.name + '</div>' +
+                '<div class="detail-stars" style="color:' + sc + '">' + '★'.repeat(hero.stars) + '</div>' +
+                '<div class="detail-class-row">' +
+                '<div class="detail-class">' + classIcons[hero.class] + ' ' + hero.class.toUpperCase() + '</div>' +
+                (hero.isLeader ? '<div class="detail-class" style="border-color:var(--gold);color:var(--gold)">LEADER</div>' : '') +
+                (hero.isDead ? '<div class="detail-class" style="border-color:#cc2222;color:#cc4444">FALLEN</div>' : '') +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+
+                // Body
+                '<div class="detail-body">' +
+
+                // Level
+                '<div>' +
+                '<div class="detail-section-title">LEVEL & EXPERIENCE</div>' +
+                '<div class="detail-level-row">' +
+                '<div class="detail-level">Lv. ' + hero.level + ' / ' + hero.maxLevel + '</div>' +
+                '<div style="font-family:Cinzel,serif;font-size:10px;color:var(--text-muted)">' + hero.exp + '%</div>' +
+                '</div>' +
+                '<div class="detail-exp-bar"><div class="detail-exp-fill" style="width:' + expPct + '"></div></div>' +
+                '</div>' +
+
+                // Stats
+                '<div>' +
+                '<div class="detail-section-title">COMBAT STATS</div>' +
+                '<div class="stat-grid">' +
+                '<div class="stat-box"><div class="stat-box-label">POWER</div><div class="stat-box-val">⚡ ' + hero.power.toLocaleString() + '</div></div>' +
+                '<div class="stat-box"><div class="stat-box-label">RARITY</div><div class="stat-box-val" style="color:' + sc + '">' + hero.stars + '★</div></div>' +
+                '<div class="stat-box"><div class="stat-box-label">CLASS</div><div class="stat-box-val">' + classIcons[hero.class] + ' ' + hero.class + '</div></div>' +
+                '<div class="stat-box"><div class="stat-box-label">STATUS</div><div class="stat-box-val" style="color:' + (hero.isDead ? '#cc4444' : '#60cc60') + '">' + (hero.isDead ? '💀 FALLEN' : '✓ ALIVE') + '</div></div>' +
+                '</div>' +
+                '</div>' +
+
+                // Skills
+                '<div>' +
+                '<div class="detail-section-title">SKILLS</div>' +
+                '<div class="skill-list">' +
+                hero.skills.map(function (s) {
+                    return '<div class="skill-row">' +
+                        '<div class="skill-icon">' + s.icon + '</div>' +
+                        '<div><div class="skill-name">' + s.name + '</div><div class="skill-desc">' + s.desc + '</div></div>' +
+                        '</div>';
+                }).join('') +
+                '</div>' +
+                '</div>' +
+
+                '</div>' + // end detail-body
+
+                // Actions
+                '<div class="detail-actions">' +
+                (!hero.isDead && !hero.isLeader ? '<div class="action-btn primary" onclick="setLeader(' + hero.id + ')">SET AS LEADER</div>' : '') +
+                (!hero.isDead ? '<div class="action-btn" onclick="upgradeHero(' + hero.id + ')">UPGRADE HERO</div>' : '') +
+                (!hero.isDead ? '<div class="action-btn danger" onclick="sacrificeHero(' + hero.id + ')">SACRIFICE (SYNTHESIS)</div>' : '') +
+                '</div>';
+        }
+
+        function closeDetail() {
+            selectedId = null;
+            document.getElementById('detailPanel').classList.remove('open');
+            applyFilters();
+        }
+
+        // ── ACTIONS ──
+        function setLeader(id) {
+            ALL_HEROES.forEach(function (h) { h.isLeader = false; });
+            var hero = ALL_HEROES.find(function (h) { return h.id === id; });
+            if (hero) { hero.isLeader = true; selectHero(hero); applyFilters(); }
+        }
+
+        function upgradeHero(id) {
+            var hero = ALL_HEROES.find(function (h) { return h.id === id; });
+            if (!hero || hero.isDead) return;
+            if (hero.level >= hero.maxLevel) { showToast('MAX LEVEL REACHED'); return; }
+            hero.level = Math.min(hero.level + 1, hero.maxLevel);
+            hero.power = Math.floor(hero.power * 1.08);
+            hero.exp = Math.min(100, hero.exp + 15);
+            selectHero(hero);
+            applyFilters();
+            showToast(hero.name.toUpperCase() + ' — LEVEL UP!');
+        }
+
+        function sacrificeHero(id) {
+            var hero = ALL_HEROES.find(function (h) { return h.id === id; });
+            if (!hero || hero.isDead || hero.isLeader) { showToast('CANNOT SACRIFICE THIS HERO'); return; }
+            if (!confirm('Sacrifice ' + hero.name + '? This cannot be undone.')) return;
+            hero.isDead = true;
+            closeDetail();
+            updateCapacity();
+            showToast(hero.name.toUpperCase() + ' HAS FALLEN IN SACRIFICE');
+        }
+
+        // ── TOAST ──
+        var toastEl = null;
+        var toastTimer = null;
+        function showToast(msg) {
+            if (!toastEl) {
+                toastEl = document.createElement('div');
+                toastEl.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(10,8,22,0.95);border:1px solid var(--gold);color:var(--gold);font-family:Cinzel,serif;font-size:11px;letter-spacing:3px;padding:10px 24px;z-index:9999;opacity:0;transition:all 0.3s ease;pointer-events:none;white-space:nowrap;';
+                document.body.appendChild(toastEl);
+            }
+            toastEl.textContent = msg;
+            toastEl.style.opacity = '1';
+            toastEl.style.transform = 'translateX(-50%) translateY(0)';
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () {
+                toastEl.style.opacity = '0';
+                toastEl.style.transform = 'translateX(-50%) translateY(20px)';
+            }, 2500);
+        }
+
+        // ── KEYBOARD ──
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeDetail();
+        });
+    </script>
+</body>
+
+</html>

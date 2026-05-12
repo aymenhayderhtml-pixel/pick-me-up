@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pick Me Up — Lobby</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-bright: #e8c96a;
+            --gold-dim: #7a5f28;
+            --gold-glow: rgba(201, 168, 76, 0.35);
+            --purple: #7c3fb0;
+            --purple-bright: #a855f7;
+            --dark: #06060e;
+            --panel: rgba(8, 6, 16, 0.78);
+            --panel-solid: rgba(10, 8, 20, 0.92);
+            --border: rgba(201, 168, 76, 0.28);
+            --border-bright: rgba(201, 168, 76, 0.65);
+            --text: #e8e0d0;
+            --text-muted: #7a6f5a;
+            --red: #cc2222;
+            --tf: 0.15s ease;
+            --tn: 0.25s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--dark);
+            color: var(--text);
+            font-family: 'Crimson Text', serif;
+            -webkit-font-smoothing: antialiased;
+            user-select: none;
+        }
+
+        /* ══════════════════════════════════
+   FULLSCREEN BACKGROUND
+══════════════════════════════════ */
+        .global-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: url('images/summon-bg.jpg');
+            background-size: cover;
+            background-position: center top;
+        }
+
+        .global-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    rgba(4, 4, 12, 0.45) 0%,
+                    rgba(4, 4, 12, 0.25) 40%,
+                    rgba(4, 4, 12, 0.55) 100%);
+        }
+
+        /* ══════════════════════════════════
+   ROOT LAYOUT
+══════════════════════════════════ */
+        .ui-root {
+            position: relative;
+            z-index: 1;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ══════════════════════════════════
+   TOP BAR
+══════════════════════════════════ */
+        .topbar {
+            display: flex;
+            align-items: center;
+            padding: 8px 20px;
+            background: linear-gradient(180deg, rgba(4, 4, 12, 0.92) 0%, rgba(4, 4, 12, 0.65) 100%);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            gap: 12px;
+            flex-shrink: 0;
+            height: 76px;
+        }
+
+        /* Player block */
+        .player-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 210px;
+        }
+
+        .avatar {
+            width: 58px;
+            height: 58px;
+            border: 2px solid var(--gold);
+            background: #1a1208;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 0 12px var(--gold-glow);
+            cursor: pointer;
+            transition: box-shadow var(--tf);
+        }
+
+        .avatar:hover {
+            box-shadow: 0 0 22px var(--gold-glow);
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2a1f10, #120c06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: var(--gold-dim);
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .player-name {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #f0e0b0;
+            letter-spacing: 0.04em;
+        }
+
+        .player-level {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            color: var(--gold);
+        }
+
+        .xp-bar-wrap {
+            width: 110px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--gold-dim);
+            margin-top: 2px;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            width: 44%;
+            background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+            box-shadow: 0 0 6px var(--gold-glow);
+        }
+
+        .xp-text {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        /* Resources */
+        .resources {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .res-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+
+        .res-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            padding: 5px 10px 5px 8px;
+            cursor: pointer;
+            transition: border-color var(--tf);
+        }
+
+        .res-badge:hover {
+            border-color: var(--gold-bright);
+        }
+
+        .res-icon {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+
+        .res-val {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #f0e0b0;
+            letter-spacing: 0.03em;
+        }
+
+        .res-plus {
+            width: 18px;
+            height: 18px;
+            border: 1px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--gold);
+            cursor: pointer;
+            transition: background var(--tf);
+        }
+
+        .res-plus:hover {
+            background: rgba(201, 168, 76, 0.2);
+        }
+
+        .res-timer {
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* Topbar right icons */
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            color: var(--text-muted);
+            transition: color var(--tf);
+        }
+
+        .icon-btn:hover {
+            color: var(--gold);
+        }
+
+        .icon-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: #e03030;
+            border-radius: 50%;
+            border: 1.5px solid var(--dark);
+            box-shadow: 0 0 6px rgba(224, 48, 48, 0.7);
+        }
+
+        /* ══════════════════════════════════
+   BODY (left / center / right)
+══════════════════════════════════ */
+        .body {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 290px 1fr 310px;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* ══════════════════════════════════
+   LEFT SIDEBAR — menu cards
+══════════════════════════════════ */
+        .left-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px 12px 12px 14px;
+        }
+
+        .menu-card {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            cursor: pointer;
+            transition: border-color var(--tn), box-shadow var(--tn), transform var(--tn);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            backdrop-filter: blur(6px);
+        }
+
+        .menu-card:hover {
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 24px rgba(201, 168, 76, 0.18), inset 0 0 20px rgba(201, 168, 76, 0.04);
+            transform: translateX(3px);
+        }
+
+        .menu-card:hover .card-title {
+            color: var(--gold-bright);
+        }
+
+        /* Corner ornaments */
+        .menu-card::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            width: 13px;
+            height: 13px;
+            border-top: 2px solid var(--gold);
+            border-right: 2px solid var(--gold);
+        }
+
+        .corner-bl {
+            position: absolute;
+            bottom: -1px;
+            left: -1px;
+            width: 13px;
+            height: 13px;
+            border-bottom: 2px solid var(--gold);
+            border-left: 2px solid var(--gold);
+        }
+
+        /* Red diamond notification */
+        .card-notif {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 6;
+            width: 14px;
+            height: 14px;
+            background: var(--red);
+            transform: rotate(45deg);
+            box-shadow: 0 0 8px rgba(204, 34, 34, 0.7);
+        }
+
+        /* Card illustration area */
+        .card-art {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .card-art img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+            filter: brightness(0.85);
+        }
+
+        .menu-card:hover .card-art img {
+            transform: scale(1.06);
+            filter: brightness(1);
+        }
+
+        /* Gradient overlay so text is readable */
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background: linear-gradient(180deg, transparent 30%, rgba(4, 2, 12, 0.88) 100%);
+        }
+
+        .card-text {
+            position: relative;
+            z-index: 3;
+            padding: 10px 13px 12px;
+        }
+
+        .card-title {
+            font-family: 'Cinzel', serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: #f0e0b0;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+            margin-bottom: 3px;
+            transition: color var(--tf);
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* ══════════════════════════════════
+   CENTER (transparent — shows bg)
+══════════════════════════════════ */
+        .center {
+            position: relative;
+        }
+
+        /* ══════════════════════════════════
+   RIGHT SIDEBAR — menu buttons
+══════════════════════════════════ */
+        .right-sidebar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(3, 1fr) auto;
+            gap: 7px;
+            padding: 12px 14px 12px 10px;
+        }
+
+        .menu-btn {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            backdrop-filter: blur(8px);
+            padding: 10px 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            text-align: center;
+            transition: border-color var(--tn), background var(--tn), box-shadow var(--tn);
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.04) 0%, transparent 60%);
+        }
+
+        .menu-btn:hover {
+            border-color: var(--gold-bright);
+            background: rgba(12, 10, 26, 0.95);
+            box-shadow: 0 0 18px rgba(201, 168, 76, 0.12);
+        }
+
+        /* Corner top-left */
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 10px;
+            height: 10px;
+            border-top: 2px solid var(--gold);
+            border-left: 2px solid var(--gold);
+        }
+
+        /* Corner bottom-right */
+        .btn-corner-br {
+            position: absolute;
+            bottom: -1px;
+            right: -1px;
+            width: 10px;
+            height: 10px;
+            border-bottom: 2px solid var(--gold);
+            border-right: 2px solid var(--gold);
+        }
+
+        .btn-notif {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 10px;
+            height: 10px;
+            background: var(--red);
+            border-radius: 50%;
+            border: 1.5px solid var(--dark);
+            box-shadow: 0 0 6px rgba(224, 48, 48, 0.6);
+        }
+
+        .btn-icon {
+            width: 38px;
+            height: 38px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: sepia(0.4) saturate(1.4) hue-rotate(10deg) brightness(1.1);
+        }
+
+        .btn-title {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: #e0cfa0;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            line-height: 1.2;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-desc {
+            font-size: 10px;
+            color: var(--text-muted);
+            line-height: 1.3;
+            padding: 0 2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Settings — full width */
+        .menu-btn-wide {
+            grid-column: 1 / -1;
+            flex-direction: row;
+            justify-content: flex-start;
+            gap: 14px;
+            padding: 10px 16px;
+            text-align: left;
+        }
+
+        .menu-btn-wide .btn-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .menu-btn-wide .btn-title {
+            font-size: 12px;
+        }
+
+        /* ══════════════════════════════════
+   BOTTOM BAR
+══════════════════════════════════ */
+        .bottom-bar {
+            display: flex;
+            align-items: stretch;
+            background: linear-gradient(0deg, rgba(4, 4, 12, 0.96) 0%, rgba(4, 4, 12, 0.80) 100%);
+            backdrop-filter: blur(14px);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+            height: 90px;
+        }
+
+        /* Submaster report */
+        .submaster {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 18px;
+            border-right: 1px solid var(--border);
+            min-width: 295px;
+            cursor: pointer;
+            position: relative;
+            transition: background var(--tf);
+        }
+
+        .submaster:hover {
+            background: rgba(201, 168, 76, 0.04);
+        }
+
+        .submaster-notif {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            background: var(--red);
+            transform: rotate(45deg);
+            box-shadow: 0 0 6px rgba(204, 34, 34, 0.7);
+        }
+
+        .submaster-avatar {
+            width: 56px;
+            height: 56px;
+            border: 1px solid var(--gold-dim);
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #1a1410;
+        }
+
+        .submaster-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sub-name {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #e0d0a0;
+            margin-bottom: 3px;
+        }
+
+        .sub-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Stats block */
+        .stats-block {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            border-right: 1px solid var(--border);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 24px;
+            flex: 1;
+            border-right: 1px solid rgba(201, 168, 76, 0.10);
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-icon {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+            opacity: 0.8;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-val {
+            font-family: 'Cinzel', serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: #f0e0b0;
+            letter-spacing: 0.02em;
+        }
+
+        /* Rate Up promo */
+        .promo-block {
+            min-width: 270px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 16px;
+            background: linear-gradient(90deg, rgba(80, 15, 140, 0.35) 0%, rgba(40, 8, 80, 0.25) 100%);
+            border-left: 1px solid rgba(168, 85, 247, 0.3);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: background var(--tf);
+        }
+
+        .promo-block:hover {
+            background: linear-gradient(90deg, rgba(80, 15, 140, 0.5) 0%, rgba(40, 8, 80, 0.4) 100%);
+        }
+
+        .promo-block::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 80% at 20% 50%, rgba(168, 85, 247, 0.18) 0%, transparent 70%);
+        }
+
+        .promo-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: radial-gradient(circle, rgba(130, 40, 210, 0.7) 0%, rgba(60, 10, 120, 0.9) 100%);
+            border: 2px solid rgba(168, 85, 247, 0.6);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .promo-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .promo-avatar-placeholder {
+            font-size: 26px;
+        }
+
+        .promo-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .promo-title {
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #e0cff0;
+            margin-bottom: 3px;
+        }
+
+        .promo-sub {
+            font-size: 11px;
+            color: rgba(200, 180, 220, 0.75);
+            margin-bottom: 4px;
+        }
+
+        .promo-stars {
+            color: var(--gold);
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        .promo-dots {
+            position: absolute;
+            bottom: 7px;
+            right: 12px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .promo-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(201, 168, 76, 0.2);
+        }
+
+        .promo-dot.on {
+            background: var(--gold);
+        }
+
+        /* ══════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════ */
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: .6;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.04)
+            }
+        }
+
+        @keyframes goldGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px var(--gold-glow)
+            }
+
+            50% {
+                box-shadow: 0 0 25px var(--gold-glow), 0 0 45px rgba(201, 168, 76, 0.12)
+            }
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) rotate(45deg)
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg)
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-4px)
+            }
+        }
+
+        .menu-card {
+            animation: fadeSlideIn 0.4s ease backwards;
+        }
+
+        .menu-card:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .menu-card:nth-child(2) {
+            animation-delay: 0.12s;
+        }
+
+        .menu-card:nth-child(3) {
+            animation-delay: 0.19s;
+        }
+
+        .menu-btn {
+            animation: fadeSlideIn 0.4s ease backwards;
+        }
+
+        .menu-btn:nth-child(1) {
+            animation-delay: 0.08s;
+        }
+
+        .menu-btn:nth-child(2) {
+            animation-delay: 0.14s;
+        }
+
+        .menu-btn:nth-child(3) {
+            animation-delay: 0.20s;
+        }
+
+        .menu-btn:nth-child(4) {
+            animation-delay: 0.26s;
+        }
+
+        .menu-btn:nth-child(5) {
+            animation-delay: 0.32s;
+        }
+
+        .menu-btn:nth-child(6) {
+            animation-delay: 0.38s;
+        }
+
+        .menu-btn:nth-child(7) {
+            animation-delay: 0.44s;
+        }
+
+        /* Shimmer on 5★ promo */
+        .promo-block::after {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: linear-gradient(45deg, transparent 40%, rgba(168, 85, 247, 0.12) 50%, transparent 60%);
+            animation: shimmer 4s linear infinite;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="global-bg"></div>
+
+    <div class="ui-root">
+
+        <!-- ══════ TOP BAR ══════ -->
+        <header class="topbar">
+            <!-- Player -->
+            <div class="player-block">
+                <div class="avatar">
+                    <!-- Replace with: <img src="images/player-avatar.jpg" alt="Avatar"> -->
+                    <div class="avatar-placeholder">⚔</div>
+                </div>
+                <div class="player-info">
+                    <div class="player-name">Master</div>
+                    <div class="player-level">Lv. 42</div>
+                    <div class="xp-bar-wrap">
+                        <div class="xp-bar-fill"></div>
+                    </div>
+                    <div class="xp-text">2,850 / 6,400</div>
+                </div>
+            </div>
+
+            <!-- Resources -->
+            <div class="resources">
+                <!-- Stamina -->
+                <div class="res-group">
+                    <div class="res-badge">
+                        <svg class="res-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <polygon points="13,2 3,14 12,14 11,22 21,10 12,10" fill="#e8c96a" stroke="#a07828"
+                                stroke-width="0.5" />
+                        </svg>
+                        <span class="res-val">87/120</span>
+                        <div class="res-plus">+</div>
+                    </div>
+                    <div class="res-timer">02:45</div>
+                </div>
+                <!-- Gems -->
+                <div class="res-badge">
+                    <svg class="res-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="12,2 20,9 17,20 7,20 4,9" fill="#50b4f0" stroke="#2a80c0" stroke-width="0.6" />
+                        <polygon points="12,5 17,10 12,19 7,10" fill="rgba(255,255,255,0.2)" />
+                    </svg>
+                    <span class="res-val">12,450</span>
+                    <div class="res-plus">+</div>
+                </div>
+                <!-- Gold -->
+                <div class="res-badge">
+                    <svg class="res-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" fill="#c9a84c" stroke="#8a6820" stroke-width="0.8" />
+                        <circle cx="12" cy="12" r="7" fill="#e0b840" opacity="0.4" />
+                        <text x="12" y="16.5" text-anchor="middle" font-size="9" font-weight="bold" fill="#6a4010"
+                            font-family="Georgia,serif">G</text>
+                    </svg>
+                    <span class="res-val">2,345,600</span>
+                    <div class="res-plus">+</div>
+                </div>
+            </div>
+
+            <!-- Right icons -->
+            <div class="topbar-right">
+                <div class="icon-btn" title="Mail">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="2" y="4" width="20" height="16" rx="1" />
+                        <polyline points="2,4 12,13 22,4" />
+                    </svg>
+                </div>
+                <div class="icon-btn" title="Notifications">
+                    <div class="notif-dot"></div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M18,8A6,6,0,0,0,6,8c0,7-3,9-3,9H21s-3-2-3-9" />
+                        <path d="M13.73,21a2,2,0,0,1-3.46,0" />
+                    </svg>
+                </div>
+                <div class="icon-btn" title="Menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </div>
+            </div>
+        </header>
+
+        <!-- ══════ BODY ══════ -->
+        <div class="body">
+
+            <!-- LEFT — menu cards -->
+            <aside class="left-sidebar">
+
+                <!-- SUMMON -->
+                <div class="menu-card" onclick="navigate('summon.html')">
+                    <div class="card-notif"></div>
+                    <div class="corner-bl"></div>
+                    <div class="card-art">
+                        <!-- Place summon card art at: images/cards/summon.jpg -->
+                        <img src="images/cards/summon.jpg" alt="Summon"
+                            onerror="this.parentElement.style.background='radial-gradient(ellipse 60% 80% at 50% 60%,rgba(124,63,176,0.55) 0%,rgba(30,10,60,0.5) 40%,rgba(6,4,14,0.9) 100%)'">
+                    </div>
+                    <div class="card-overlay"></div>
+                    <div class="card-text">
+                        <div class="card-title">Summon</div>
+                        <div class="card-desc">Summon heroes to join your army.</div>
+                    </div>
+                </div>
+
+                <!-- TOWER -->
+                <div class="menu-card" onclick="navigate('tower.html')">
+                    <div class="card-notif"></div>
+                    <div class="corner-bl"></div>
+                    <div class="card-art">
+                        <!-- Place tower card art at: images/cards/tower.jpg -->
+                        <img src="images/cards/tower.jpg" alt="Tower"
+                            onerror="this.parentElement.style.background='radial-gradient(ellipse 50% 70% at 50% 45%,rgba(70,60,100,0.4) 0%,rgba(15,12,28,0.7) 60%,rgba(6,4,14,0.95) 100%)'">
+                    </div>
+                    <div class="card-overlay"></div>
+                    <div class="card-text">
+                        <div class="card-title">Tower</div>
+                        <div class="card-desc">Conquer the 100-floor tower.</div>
+                    </div>
+                </div>
+
+                <!-- DUNGEON -->
+                <div class="menu-card" onclick="navigate('dungeon.html')">
+                    <div class="card-notif"></div>
+                    <div class="corner-bl"></div>
+                    <div class="card-art">
+                        <!-- Place dungeon card art at: images/cards/dungeon.jpg -->
+                        <img src="images/cards/dungeon.jpg" alt="Dungeon"
+                            onerror="this.parentElement.style.background='radial-gradient(ellipse 60% 80% at 50% 60%,rgba(100,35,160,0.5) 0%,rgba(35,12,65,0.55) 40%,rgba(6,4,14,0.9) 100%)'">
+                    </div>
+                    <div class="card-overlay"></div>
+                    <div class="card-text">
+                        <div class="card-title">Dungeon</div>
+                        <div class="card-desc">Challenge dungeons and earn rewards.</div>
+                    </div>
+                </div>
+
+            </aside>
+
+            <!-- CENTER — transparent, shows background -->
+            <div class="center"></div>
+
+            <!-- RIGHT — menu buttons -->
+            <aside class="right-sidebar">
+
+                <!-- Inventory -->
+                <div class="menu-btn" onclick="navigate('inventory.html')">
+                    <div class="btn-corner-br"></div>
+                    <div class="btn-icon">
+                        <!-- images/icons/inventory.png -->
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="10" width="32" height="24" rx="1.5" fill="none" stroke="#c9a84c"
+                                stroke-width="1.5" />
+                            <rect x="13" y="6" width="14" height="6" rx="1" fill="none" stroke="#c9a84c"
+                                stroke-width="1.5" />
+                            <line x1="4" y1="20" x2="36" y2="20" stroke="#c9a84c" stroke-width="1" opacity="0.45" />
+                            <rect x="8" y="24" width="8" height="6" rx="0.5" fill="rgba(201,168,76,0.22)"
+                                stroke="#c9a84c" stroke-width="1" />
+                            <rect x="22" y="24" width="8" height="6" rx="0.5" fill="rgba(201,168,76,0.14)"
+                                stroke="#c9a84c" stroke-width="1" />
+                        </svg>
+                    </div>
+                    <div class="btn-title">Inventory</div>
+                    <div class="btn-desc">Manage your items and equipment.</div>
+                </div>
+
+                <!-- Memorial Hall -->
+                <div class="menu-btn" onclick="navigate('memorial.html')">
+                    <div class="btn-corner-br"></div>
+                    <div class="btn-icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="18" width="24" height="18" rx="1" fill="none" stroke="#c9a84c"
+                                stroke-width="1.5" />
+                            <polygon points="6,18 34,18 20,6" fill="none" stroke="#c9a84c" stroke-width="1.5" />
+                            <line x1="20" y1="22" x2="20" y2="28" stroke="#c9a84c" stroke-width="1.5" />
+                            <circle cx="20" cy="31" r="2" fill="#c9a84c" opacity="0.6" />
+                        </svg>
+                    </div>
+                    <div class="btn-title">Memorial Hall</div>
+                    <div class="btn-desc">View fallen heroes and extract essence.</div>
+                </div>
+
+                <!-- Facilities -->
+                <div class="menu-btn" onclick="navigate('facilities.html')">
+                    <div class="btn-corner-br"></div>
+                    <div class="btn-notif"></div>
+                    <div class="btn-icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="18" width="32" height="18" fill="none" stroke="#c9a84c" stroke-width="1.5" />
+                            <polygon points="2,18 20,6 38,18" fill="none" stroke="#c9a84c" stroke-width="1.5" />
+                            <rect x="16" y="24" width="8" height="12" fill="rgba(201,168,76,0.18)" stroke="#c9a84c"
+                                stroke-width="1" />
+                            <rect x="6" y="22" width="6" height="6" fill="rgba(201,168,76,0.12)" stroke="#c9a84c"
+                                stroke-width="0.8" />
+                            <rect x="28" y="22" width="6" height="6" fill="rgba(201,168,76,0.12)" stroke="#c9a84c"
+                                stroke-width="0.8" />
+                        </svg>
+                    </div>
+                    <div class="btn-title">Facilities</div>
+                    <div class="btn-desc">Upgrade facilities to grow stronger.</div>
+                </div>
+
+                <!-- Synthesis -->
+                <div class="menu-btn" onclick="navigate('synthesis.html')">
+                    <div class="btn-corner-br"></div>
+                    <div class="btn-notif"></div>
+                    <div class="btn-icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20,5 L27,15 L23,15 L23,25 L27,25 L20,35 L13,25 L17,25 L17,15 L13,15 Z" fill="none"
+                                stroke="#c9a84c" stroke-width="1.5" />
+                            <circle cx="20" cy="20" r="4.5" fill="rgba(201,168,76,0.25)" stroke="#c9a84c"
+                                stroke-width="1" />
+                            <circle cx="20" cy="20" r="1.8" fill="#c9a84c" />
+                        </svg>
+                    </div>
+                    <div class="btn-title">Synthesis</div>
+                    <div class="btn-desc">Promote heroes through sacrifice.</div>
+                </div>
+
+                <!-- Daily -->
+                <div class="menu-btn" onclick="navigate('daily.html')">
+                    <div class="btn-corner-br"></div>
+                    <div class="btn-notif"></div>
+                    <div class="btn-icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="9" width="32" height="28" rx="1" fill="none" stroke="#c9a84c"
+                                stroke-width="1.5" />
+                            <line x1="4" y1="17" x2="36" y2="17" stroke="#c9a84c" stroke-width="1" opacity="0.5" />
+                            <line x1="13" y1="4" x2="13" y2="14" stroke="#c9a84c" stroke-width="1.8" />
+                            <line x1="27" y1="4" x2="27" y2="14" stroke="#c9a84c" stroke-width="1.8" />
+                            <rect x="8" y="21" width="7" height="6" rx="0.5" fill="rgba(201,168,76,0.3)"
+                                stroke="#c9a84c" stroke-width="0.9" />
+                            <rect x="22" y="21" width="7" height="6" rx="0.5" fill="rgba(201,168,76,0.1)"
+                                stroke="#c9a84c" stroke-width="0.9" />
+                            <rect x="8" y="29" width="7" height="5" rx="0.5" fill="rgba(201,168,76,0.1)"
+                                stroke="#c9a84c" stroke-width="0.9" />
+                        </svg>
+                    </div>
+                    <div class="btn-title">Daily</div>
+                    <div class="btn-desc">Daily tasks and valuable rewards.</div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="menu-btn" onclick="navigate('achievements.html')">
+                    <div class="btn-corner-br"></div>
+                    <div class="btn-notif"></div>
+                    <div class="btn-icon">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <polygon
+                                points="20,3 23.5,13 34,13 25.5,19.5 28.5,30 20,23.5 11.5,30 14.5,19.5 6,13 16.5,13"
+                                fill="none" stroke="#c9a84c" stroke-width="1.5" />
+                            <polygon
+                                points="20,8 22.5,15.5 30,15.5 24,19.5 26.5,27 20,22.5 13.5,27 16,19.5 10,15.5 17.5,15.5"
+                                fill="rgba(201,168,76,0.18)" />
+                        </svg>
+                    </div>
+                    <div class="btn-title">Achievements</div>
+                    <div class="btn-desc">Track your progress and earn rewards.</div>
+                </div>
+
+                <!-- Settings — wide -->
+                <div class="menu-btn menu-btn-wide" onclick="navigate('settings.html')">
+                    <div class="btn-corner-br"></div>
+                    <div class="btn-icon" style="width:32px;height:32px;flex-shrink:0">
+                        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="20" cy="20" r="9" fill="none" stroke="#c9a84c" stroke-width="1.5" />
+                            <circle cx="20" cy="20" r="4" fill="rgba(201,168,76,0.22)" stroke="#c9a84c"
+                                stroke-width="1" />
+                            <line x1="20" y1="5" x2="20" y2="11" stroke="#c9a84c" stroke-width="2" />
+                            <line x1="20" y1="29" x2="20" y2="35" stroke="#c9a84c" stroke-width="2" />
+                            <line x1="5" y1="20" x2="11" y2="20" stroke="#c9a84c" stroke-width="2" />
+                            <line x1="29" y1="20" x2="35" y2="20" stroke="#c9a84c" stroke-width="2" />
+                            <line x1="9.4" y1="9.4" x2="13.5" y2="13.5" stroke="#c9a84c" stroke-width="1.5" />
+                            <line x1="26.5" y1="26.5" x2="30.6" y2="30.6" stroke="#c9a84c" stroke-width="1.5" />
+                            <line x1="30.6" y1="9.4" x2="26.5" y2="13.5" stroke="#c9a84c" stroke-width="1.5" />
+                            <line x1="13.5" y1="26.5" x2="9.4" y2="30.6" stroke="#c9a84c" stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <div class="btn-text">
+                        <div class="btn-title">Settings</div>
+                        <div class="btn-desc">Adjust game settings.</div>
+                    </div>
+                </div>
+
+            </aside>
+        </div><!-- end body -->
+
+        <!-- ══════ BOTTOM BAR ══════ -->
+        <footer class="bottom-bar">
+
+            <!-- Submaster Report -->
+            <div class="submaster" onclick="navigate('report.html')">
+                <div class="submaster-notif"></div>
+                <div class="submaster-avatar">
+                    <!-- Place submaster image at: images/submaster.jpg -->
+                    <img src="images/submaster.jpg" alt="Submaster"
+                        onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#1e1a12,#120e08)'">
+                </div>
+                <div>
+                    <div class="sub-name">Submaster Report</div>
+                    <div class="sub-desc">Submaster has returned with an offline report.</div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-block">
+                <div class="stat-item">
+                    <svg class="stat-icon" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="14" width="18" height="12" rx="1" fill="none" stroke="#c9a84c"
+                            stroke-width="1.2" />
+                        <polygon points="14,2 18,12 10,12" fill="none" stroke="#c9a84c" stroke-width="1.2" />
+                        <line x1="10" y1="12" x2="10" y2="14" stroke="#c9a84c" stroke-width="1.2" />
+                        <line x1="18" y1="12" x2="18" y2="14" stroke="#c9a84c" stroke-width="1.2" />
+                    </svg>
+                    <div>
+                        <div class="stat-label">Highest Floor</div>
+                        <div class="stat-val">Floor 47</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <svg class="stat-icon" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="3" y1="25" x2="25" y2="3" stroke="#c9a84c" stroke-width="1.5" />
+                        <line x1="3" y1="3" x2="25" y2="25" stroke="#c9a84c" stroke-width="1.5" opacity="0.4" />
+                        <circle cx="14" cy="14" r="5" fill="none" stroke="#c9a84c" stroke-width="1.2" />
+                    </svg>
+                    <div>
+                        <div class="stat-label">Power</div>
+                        <div class="stat-val">126,840</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <svg class="stat-icon" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14,3 Q20,7 20,14 Q20,22 14,25 Q8,22 8,14 Q8,7 14,3Z" fill="none" stroke="#c9a84c"
+                            stroke-width="1.2" />
+                        <polygon points="11,5 14,1 17,5" fill="#c9a84c" opacity="0.55" />
+                    </svg>
+                    <div>
+                        <div class="stat-label">Heroes</div>
+                        <div class="stat-val">28/50</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rate Up Promo -->
+            <div class="promo-block" onclick="navigate('summon.html')">
+                <div class="promo-avatar">
+                    <!-- Place promo hero image at: images/promo-hero.jpg -->
+                    <img src="images/promo-hero.jpg" alt="Rate Up Hero" onerror="this.style.display='none'">
+                    <div class="promo-avatar-placeholder">★</div>
+                </div>
+                <div class="promo-text">
+                    <div class="promo-title">Rate Up Summon</div>
+                    <div class="promo-sub">Increased chance for 5★ heroes!</div>
+                    <div class="promo-stars">★★★★★</div>
+                </div>
+                <div class="promo-dots">
+                    <div class="promo-dot on"></div>
+                    <div class="promo-dot"></div>
+                    <div class="promo-dot"></div>
+                    <div class="promo-dot"></div>
+                </div>
+            </div>
+
+        </footer>
+
+    </div><!-- end ui-root -->
+
+    <script>
+        function navigate(page) {
+            window.location.href = page;
+        }
+
+        // Stamina timer countdown
+        var timerEl = document.querySelector('.res-timer');
+        var seconds = 2 * 60 + 45;
+        setInterval(function () {
+            if (seconds <= 0) { seconds = 4 * 60; }
+            seconds--;
+            var m = Math.floor(seconds / 60);
+            var s = seconds % 60;
+            timerEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+        }, 1000);
+
+        // Promo dots cycle
+        var dots = document.querySelectorAll('.promo-dot');
+        var current = 0;
+        setInterval(function () {
+            dots[current].classList.remove('on');
+            current = (current + 1) % dots.length;
+            dots[current].classList.add('on');
+        }, 3000);
+    </script>
+
+</body>
+
+</html>
