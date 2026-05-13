@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pick Me Up — Memorial Hall</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-bright: #e8c96a;
+            --gold-dim: #7a5f28;
+            --gold-glow: rgba(201, 168, 76, 0.3);
+            --star5: #ffd700;
+            --star4: #c080ff;
+            --star3: #60a0ff;
+            --star2: #60ff80;
+            --star1: #aaaaaa;
+            --red: #cc2222;
+            --purple: #7c3fb0;
+            --dark: #06060e;
+            --panel: rgba(8, 6, 18, 0.82);
+            --panel-solid: rgba(10, 8, 22, 0.95);
+            --border: rgba(201, 168, 76, 0.25);
+            --border-bright: rgba(201, 168, 76, 0.6);
+            --text: #e8e0d0;
+            --text-muted: #7a6f5a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: var(--dark);
+            color: var(--text);
+        }
+
+        .global-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: url('images/summon-bg.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .global-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 2, 8, 0.85);
+            pointer-events: none;
+        }
+
+        .ash-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.15;
+            background-image: radial-gradient(circle at 50% 50%, transparent 60%, var(--dark) 100%);
+            animation: ash-drift 15s linear infinite;
+        }
+
+        @keyframes ash-drift {
+            from {
+                transform: translateY(-10%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-dim);
+            border-radius: 4px;
+        }
+
+        .cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        .crimson {
+            font-family: 'Crimson Text', serif;
+        }
+
+        .topbar {
+            position: relative;
+            z-index: 10;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            backdrop-filter: blur(14px);
+            background: rgba(4, 4, 14, 0.92);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+
+        .topbar .back-btn:hover {
+            color: var(--gold-bright);
+        }
+
+        .topbar .title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .essence-counter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .essence-icon {
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle, var(--gold-bright), var(--purple));
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--gold-glow);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                opacity: 0.8;
+            }
+
+            50% {
+                opacity: 1;
+                box-shadow: 0 0 15px var(--gold);
+            }
+        }
+
+        .main-layout {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100% - 60px);
+        }
+
+        .panel {
+            background: var(--panel);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .corner-ornament::before,
+        .corner-ornament::after {
+            content: '';
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            border: 2px solid var(--gold);
+            pointer-events: none;
+        }
+
+        .corner-ornament::before {
+            top: 4px;
+            left: 4px;
+            border-right: 0;
+            border-bottom: 0;
+        }
+
+        .corner-ornament::after {
+            bottom: 4px;
+            right: 4px;
+            border-left: 0;
+            border-top: 0;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--gold);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .fallen-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 6px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            align-content: start;
+        }
+
+        .fallen-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .fallen-card:hover {
+            border-color: var(--border-bright);
+            transform: translateY(-3px);
+        }
+
+        .fallen-card.selected {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .fallen-portrait {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            background: #111;
+        }
+
+        .fallen-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fallen-badge {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: var(--red);
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .fallen-name {
+            font-size: 0.75rem;
+            color: var(--text);
+            margin-top: 8px;
+            padding: 4px;
+            background: rgba(0, 0, 0, 0.5);
+            width: 100%;
+            text-align: center;
+        }
+
+        .fallen-stars {
+            font-size: 0.6rem;
+            color: var(--gold-dim);
+            margin-top: 2px;
+        }
+
+        .detail-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .memorial-stone {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .candle-glow {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(255, 200, 100, 0.4), transparent 70%);
+            animation: flicker 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes flicker {
+
+            0%,
+            100% {
+                opacity: 0.7;
+                transform: translateX(-50%) scale(0.9);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1.1);
+            }
+        }
+
+        .stone-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--gold-bright);
+            margin-bottom: 8px;
+        }
+
+        .epitaph {
+            font-style: italic;
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+
+        .cause-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 0.8rem;
+        }
+
+        .tag {
+            padding: 3px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .extract-panel {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .progress-track {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--purple), var(--gold));
+            transition: width 0.5s;
+        }
+
+        .extract-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(to bottom, var(--gold-bright), var(--gold-dim));
+            border: 1px solid var(--gold);
+            border-radius: 6px;
+            color: #1a1005;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .extract-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .extract-btn:hover:not(:disabled) {
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-family: 'Cinzel', serif;
+        }
+
+        .stat-val {
+            font-size: 0.9rem;
+            color: var(--gold-bright);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="global-bg"></div>
+    <div class="ash-overlay"></div>
+
+    <header class="topbar">
+        <div class="back-btn" onclick="location.href='index.html'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Return to Lobby
+        </div>
+        <div class="title">◆ MEMORIAL HALL ◆</div>
+        <div class="essence-counter">
+            <div class="essence-icon"></div><span id="essenceCount">0</span>
+        </div>
+    </header>
+
+    <main class="main-layout">
+        <section class="panel corner-ornament">
+            <h2 class="panel-title">FALLEN HEROES</h2>
+            <div class="fallen-grid" id="fallenGrid"></div>
+        </section>
+
+        <section class="panel corner-ornament detail-panel">
+            <div class="memorial-stone" id="stoneArea">
+                <div class="candle-glow"></div>
+                <div class="stone-title">Select a Memorial Stone</div>
+                <div class="epitaph">"Their light fades, but their sacrifice fuels our ascent."</div>
+            </div>
+
+            <div class="extract-panel" id="extractPanel" style="display:none;">
+                <h3 class="panel-title" style="margin-bottom:8px; border:0; padding:0;">ESSENCE EXTRACTION</h3>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:4px;">
+                    <span id="extractStatus">Pending Ritual</span>
+                    <span id="extractPct">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <button class="extract-btn" id="extractBtn" onclick="startExtraction()">BEGIN RITUAL</button>
+                <div style="margin-top:8px; font-size:0.75rem; color:var(--text-muted); text-align:center;">
+                    Yield: <span id="yieldVal">+5 Essence, +300 Gold</span>
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-box">
+                    <div class="stat-label">COLLECTED</div>
+                    <div class="stat-val" id="statColl">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">RECOVERED</div>
+                    <div class="stat-val" id="statRec">0/0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">TOTAL</div>
+                    <div class="stat-val" id="statTot">0</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const STORAGE_KEY = 'memorial_state';
+        let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+            essence: 12,
+            extracted: 0,
+            totalFallen: 4,
+            fallen: [
+                { id: 'f1', name: 'Scout', star: 2, img: 'heros/2★ Scout.png', cause: 'Tower Floor 28', epitaph: 'His eyes saw the path, but his feet could not hold.', progress: 100, extracted: true },
+                { id: 'f2', name: 'Beggar', star: 1, img: 'heros/1★ Beggar.png', cause: 'Dungeon: Crypt', epitaph: 'From nothing to legend. The dust returns to dust.', progress: 65, extracted: false },
+                { id: 'f3', name: 'Maid', star: 1, img: 'heros/1★ Maid.png', cause: 'Synthesis Sacrifice', epitaph: 'She served with grace, even in the end.', progress: 0, extracted: false },
+                { id: 'f4', name: 'Knight', star: 3, img: 'heros/3★ Knight.png', cause: 'Boss: Warden', epitaph: 'The shield broke. The oath did not.', progress: 100, extracted: true }
+            ]
+        };
+        let selected = null;
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function updateUI() {
+            document.getElementById('essenceCount').textContent = state.essence;
+            document.getElementById('statColl').textContent = state.essence;
+            document.getElementById('statTot').textContent = state.totalFallen;
+            const recovered = state.fallen.filter(f => f.extracted).length;
+            document.getElementById('statRec').textContent = recovered + '/' + state.totalFallen;
+            renderGrid();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('fallenGrid');
+            grid.innerHTML = '';
+            state.fallen.forEach(h => {
+                const card = document.createElement('div');
+                card.className = 'fallen-card' + (selected && selected.id === h.id ? ' selected' : '');
+                card.innerHTML = `
+          <img class="fallen-portrait" src="${h.img}" onerror="this.style.background='#111'">
+          <div class="fallen-overlay">
+            <div class="fallen-badge">💀 FALLEN</div>
+            <div class="fallen-name">${h.name}</div>
+            <div class="fallen-stars">${'★'.repeat(h.star)}</div>
+          </div>`;
+                card.onclick = () => selectHero(h);
+                grid.appendChild(card);
+            });
+        }
+
+        function selectHero(hero) {
+            selected = hero;
+            document.getElementById('stoneArea').innerHTML = `
+        <div class="candle-glow"></div>
+        <div class="stone-title">${hero.name}</div>
+        <div style="font-size:1.2rem; margin-bottom:8px;">${'★'.repeat(hero.star)}</div>
+        <div class="epitaph">"${hero.epitaph}"</div>
+        <div class="cause-row">
+          <span class="tag">💀 ${hero.cause}</span>
+          <span class="tag">📊 ${hero.progress}% Extracted</span>
+        </div>`;
+
+            const panel = document.getElementById('extractPanel');
+            panel.style.display = 'block';
+            document.getElementById('progressBar').style.width = hero.progress + '%';
+            document.getElementById('extractPct').textContent = Math.floor(hero.progress) + '%';
+
+            const btn = document.getElementById('extractBtn');
+            btn.disabled = hero.progress >= 100;
+            btn.textContent = hero.progress >= 100 ? (hero.extracted ? 'EXTRACTED' : 'RITUAL COMPLETE') : 'BEGIN RITUAL';
+        }
+
+        function startExtraction() {
+            if (!selected || selected.progress >= 100) return;
+            const btn = document.getElementById('extractBtn');
+            btn.disabled = true;
+
+            let p = selected.progress;
+            const iv = setInterval(() => {
+                p += Math.random() * 8;
+                if (p >= 100) {
+                    p = 100;
+                    clearInterval(iv);
+                    selected.extracted = true;
+                    state.essence += 5;
+                    saveState();
+                    updateUI();
+                }
+                selected.progress = p;
+                document.getElementById('progressBar').style.width = p + '%';
+                document.getElementById('extractPct').textContent = Math.floor(p) + '%';
+                document.getElementById('extractStatus').textContent = p >= 100 ? 'COMPLETE' : 'Channeling...';
+                if (p >= 100) {
+                    btn.textContent = 'EXTRACTED';
+                }
+            }, 200);
+        }
+
+        updateUI();
+    </script>
+</body>
+
+</html>

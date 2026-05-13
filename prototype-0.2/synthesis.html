@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pick Me Up — Synthesis Chamber</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-bright: #e8c96a;
+            --gold-dim: #7a5f28;
+            --gold-glow: rgba(201, 168, 76, 0.3);
+            --star5: #ffd700;
+            --star4: #c080ff;
+            --star3: #60a0ff;
+            --star2: #60ff80;
+            --star1: #aaaaaa;
+            --red: #cc2222;
+            --purple: #7c3fb0;
+            --dark: #06060e;
+            --panel: rgba(8, 6, 18, 0.82);
+            --panel-solid: rgba(10, 8, 22, 0.95);
+            --border: rgba(201, 168, 76, 0.25);
+            --border-bright: rgba(201, 168, 76, 0.6);
+            --text: #e8e0d0;
+            --text-muted: #7a6f5a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: var(--dark);
+            color: var(--text);
+        }
+
+        .global-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: radial-gradient(ellipse at 50% 40%, #1a0a2e 0%, #0d0618 50%, var(--dark) 100%);
+        }
+
+        .global-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('images/summon-bg.jpg') center/cover;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-dim);
+            border-radius: 4px;
+        }
+
+        .cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        .crimson {
+            font-family: 'Crimson Text', serif;
+        }
+
+        /* ─── TOP BAR ─── */
+        .topbar {
+            position: relative;
+            z-index: 10;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            backdrop-filter: blur(14px);
+            background: rgba(4, 4, 14, 0.92);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .topbar .back-btn:hover {
+            color: var(--gold-bright);
+        }
+
+        .topbar .title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .topbar .materials {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .mat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .mat-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .mat-icon.stone {
+            background: linear-gradient(135deg, var(--purple), #9b4dca);
+        }
+
+        .mat-icon.material {
+            background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+        }
+
+        /* ─── MAIN LAYOUT ─── */
+        .main-layout {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: 55% 45%;
+            gap: 16px;
+            padding: 16px;
+            height: calc(100% - 56px - 64px);
+        }
+
+        .panel {
+            background: var(--panel);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .corner-ornament {
+            position: relative;
+        }
+
+        .corner-ornament::before,
+        .corner-ornament::after {
+            content: '';
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            border: 2px solid var(--gold);
+        }
+
+        .corner-ornament::before {
+            top: 4px;
+            left: 4px;
+            border-right: 0;
+            border-bottom: 0;
+        }
+
+        .corner-ornament::after {
+            bottom: 4px;
+            right: 4px;
+            border-left: 0;
+            border-top: 0;
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: var(--gold);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        /* ─── LEFT COLUMN: WORKSPACE ─── */
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        /* Target Slot */
+        .target-section {
+            text-align: center;
+        }
+
+        .promo-req {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .promo-req .star-highlight {
+            color: var(--gold-bright);
+            font-weight: 600;
+        }
+
+        .target-slot {
+            width: 100%;
+            max-width: 220px;
+            height: 180px;
+            margin: 0 auto 10px;
+            border: 2px dashed var(--border-bright);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            background: rgba(201, 168, 76, 0.03);
+        }
+
+        .target-slot:hover {
+            border-color: var(--gold);
+            background: rgba(201, 168, 76, 0.08);
+        }
+
+        .target-slot.filled {
+            border-style: solid;
+            border-color: var(--gold);
+            background: linear-gradient(to bottom, rgba(201, 168, 76, 0.1), rgba(0, 0, 0, 0.2));
+            box-shadow: 0 0 25px rgba(201, 168, 76, 0.15);
+        }
+
+        .target-slot .empty-icon {
+            font-size: 1.5rem;
+            color: var(--gold);
+            opacity: 0.6;
+        }
+
+        .target-slot .empty-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .target-slot .hero-portrait {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--gold-dim);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .target-slot .hero-name {
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            margin-top: 8px;
+        }
+
+        .target-slot .hero-stars {
+            font-size: 1rem;
+            margin-top: 2px;
+        }
+
+        .target-slot .hero-level {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .target-slot .hero-skills {
+            margin-top: 6px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .mat-cost-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 8px;
+            font-size: 0.75rem;
+        }
+
+        .mat-cost-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .mat-cost-item .icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        .mat-cost-item .icon.stone {
+            background: var(--purple);
+        }
+
+        .mat-cost-item .icon.material {
+            background: var(--gold);
+        }
+
+        .mat-cost-item.has {
+            color: var(--star2);
+        }
+
+        .mat-cost-item.missing {
+            color: var(--red);
+        }
+
+        /* Arcane Circle */
+        .arcane-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arcane-svg {
+            width: 100%;
+            height: 100%;
+            animation: arcane-rotate 20s linear infinite, arcane-pulse 3s ease-in-out infinite;
+        }
+
+        .arcane-container.active .arcane-svg {
+            animation-duration: 8s, 1s;
+        }
+
+        @keyframes arcane-rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes arcane-pulse {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 8px var(--gold-glow));
+                opacity: 0.7;
+            }
+
+            50% {
+                filter: drop-shadow(0 0 16px var(--gold));
+                opacity: 1;
+            }
+        }
+
+        /* Sacrifice Slots */
+        .sacrifice-section {
+            text-align: center;
+        }
+
+        .sacrifice-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .sacrifice-slot {
+            width: 70px;
+            height: 85px;
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .sacrifice-slot:hover {
+            border-color: var(--gold-bright);
+        }
+
+        .sacrifice-slot.filled {
+            border-style: solid;
+            border-color: var(--red);
+            box-shadow: 0 0 12px rgba(204, 34, 34, 0.3);
+        }
+
+        .sacrifice-slot.filled::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(204, 34, 34, 0.15);
+            pointer-events: none;
+        }
+
+        .sacrifice-slot .skull {
+            font-size: 1.2rem;
+            opacity: 0.5;
+        }
+
+        .sacrifice-slot .slot-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .sacrifice-slot .sacr-portrait {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--red);
+            filter: brightness(0.7) saturate(0.5);
+        }
+
+        .sacrifice-slot .sacr-name {
+            font-size: 0.55rem;
+            margin-top: 4px;
+            text-decoration: line-through;
+            color: var(--red);
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        .sacrifice-slot .remove-sacr {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 0.5rem;
+            cursor: pointer;
+            display: none;
+            z-index: 2;
+        }
+
+        .sacrifice-slot.filled:hover .remove-sacr {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Requirements Panel */
+        .req-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+
+        .req-title {
+            font-size: 0.8rem;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+
+        .promo-path {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 8px 0;
+        }
+
+        .promo-path .star-box {
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+        }
+
+        .promo-path .arrow {
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        .req-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0;
+            font-size: 0.75rem;
+        }
+
+        .req-check {
+            font-size: 0.85rem;
+        }
+
+        .req-check.pass {
+            color: var(--star2);
+        }
+
+        .req-check.fail {
+            color: var(--red);
+        }
+
+        .skill-unlock {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(124, 63, 176, 0.15);
+            border: 1px solid rgba(124, 63, 176, 0.3);
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .skill-unlock .mystery {
+            width: 40px;
+            height: 40px;
+            margin: 4px auto;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--gold-dim);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--gold-bright);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .skill-unlock .label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .warning-text {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            font-style: italic;
+            color: var(--red);
+            text-align: center;
+            animation: warning-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes warning-pulse {
+
+            0%,
+            100% {
+                opacity: 0.7;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ─── RIGHT COLUMN: HERO SELECTION ─── */
+        .hero-select-panel {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-family: 'Cinzel', serif;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .tab.active {
+            background: rgba(201, 168, 76, 0.15);
+            border-color: var(--gold);
+            color: var(--gold-bright);
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            padding: 3px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.65rem;
+            font-family: 'Cinzel', serif;
+            transition: 0.2s;
+        }
+
+        .pill.active {
+            background: rgba(201, 168, 76, 0.2);
+            border-color: var(--gold);
+            color: var(--gold-bright);
+        }
+
+        .hero-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .hero-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-card .portrait {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hero-card .info {
+            padding: 4px;
+            text-align: center;
+        }
+
+        .hero-card .name {
+            font-size: 0.6rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hero-card .stars {
+            font-size: 0.55rem;
+            margin-top: 1px;
+        }
+
+        .hero-card .level {
+            font-size: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .hero-card.selected-target {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .hero-card.selected-target::after {
+            content: '★ TARGET';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background: var(--gold);
+            color: var(--dark);
+            font-size: 0.5rem;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Cinzel', serif;
+        }
+
+        .hero-card.selected-sacrifice {
+            border-color: var(--red);
+        }
+
+        .hero-card.selected-sacrifice::after {
+            content: '⚰ SACRIFICE';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background: var(--red);
+            color: #fff;
+            font-size: 0.5rem;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Cinzel', serif;
+        }
+
+        .hero-card.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            filter: grayscale(0.8);
+        }
+
+        /* ─── BOTTOM BAR ─── */
+        .bottombar {
+            position: relative;
+            z-index: 10;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            gap: 12px;
+            backdrop-filter: blur(14px);
+            background: rgba(4, 4, 14, 0.92);
+            border-top: 1px solid var(--border);
+        }
+
+        .summary {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .summary .highlight {
+            color: var(--gold-bright);
+        }
+
+        .btn-synthesize {
+            padding: 10px 24px;
+            background: linear-gradient(to bottom, var(--gold-bright), var(--gold-dim));
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            color: #1a1005;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-synthesize.ready {
+            animation: btn-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes btn-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px var(--gold-glow);
+            }
+
+            50% {
+                box-shadow: 0 0 25px var(--gold), 0 0 50px var(--gold-glow);
+            }
+        }
+
+        .btn-synthesize:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            animation: none;
+        }
+
+        .btn-reset {
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-family: 'Cinzel', serif;
+            transition: 0.2s;
+        }
+
+        .btn-reset:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        /* ─── SYNTHESIS ANIMATION OVERLAY ─── */
+        .synth-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--panel-solid);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .synth-overlay.active {
+            display: flex;
+        }
+
+        .synth-circle {
+            width: 200px;
+            height: 200px;
+            animation: synth-spin 2s linear infinite;
+        }
+
+        @keyframes synth-spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .synth-text {
+            margin-top: 20px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--gold);
+            letter-spacing: 2px;
+            animation: text-fade 1s ease-in-out infinite;
+        }
+
+        @keyframes text-fade {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .synth-burst {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, var(--gold-bright), transparent 70%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .synth-burst.active {
+            animation: burst-anim 1s ease-out forwards;
+        }
+
+        @keyframes burst-anim {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(2);
+            }
+        }
+
+        .result-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.3);
+            opacity: 0;
+            transition: 0.5s;
+            text-align: center;
+        }
+
+        .result-card.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .result-card .portrait {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--gold);
+            box-shadow: 0 0 30px var(--gold-glow);
+        }
+
+        .result-card .name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            margin-top: 10px;
+        }
+
+        .result-card .stars {
+            font-size: 1.5rem;
+            margin: 6px 0;
+        }
+
+        .result-card .promo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .result-card .new-skill {
+            font-size: 0.85rem;
+            color: var(--star4);
+            margin: 8px 0;
+            padding: 6px 12px;
+            background: rgba(124, 63, 176, 0.2);
+            border-radius: 6px;
+        }
+
+        .result-card .continue-btn {
+            margin-top: 16px;
+            padding: 10px 30px;
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Shimmer for promoted hero */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        .shimmer-text {
+            background: linear-gradient(90deg, var(--star5), var(--gold-bright), var(--star5));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="global-bg"></div>
+
+    <header class="topbar">
+        <div class="back-btn" onclick="location.href='index.html'">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back
+        </div>
+        <div class="title">◆ SYNTHESIS CHAMBER ◆</div>
+        <div class="materials">
+            <div class="mat-item">
+                <div class="mat-icon stone"></div><span id="stoneCount">24</span>
+            </div>
+            <div class="mat-item">
+                <div class="mat-icon material"></div><span id="matCount">8</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-layout">
+        <!-- LEFT: WORKSPACE -->
+        <section class="panel corner-ornament">
+            <h2 class="panel-title">SYNTHESIS WORKSPACE</h2>
+            <div class="workspace">
+                <!-- Target -->
+                <div class="target-section">
+                    <div class="promo-req" id="promoReq">Select a hero to promote</div>
+                    <div class="target-slot" id="targetSlot" onclick="clearTarget()">
+                        <div class="empty-icon">+</div>
+                        <div class="empty-text">SELECT HERO TO PROMOTE</div>
+                    </div>
+                    <div class="mat-cost-row" id="matCostRow" style="display:none">
+                        <div class="mat-cost-item" id="stoneCost">
+                            <div class="icon stone"></div><span>0</span>
+                        </div>
+                        <div class="mat-cost-item" id="matCost">
+                            <div class="icon material"></div><span>0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arcane Circle -->
+                <div class="arcane-container" id="arcaneContainer">
+                    <svg class="arcane-svg" viewBox="0 0 200 200">
+                        <defs>
+                            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#e8c96a;stop-opacity:0.8" />
+                                <stop offset="50%" style="stop-color:#c9a84c;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#7a5f28;stop-opacity:0.6" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="url(#goldGrad)" stroke-width="1"
+                            stroke-dasharray="5 15" />
+                        <circle cx="100" cy="100" r="75" fill="none" stroke="url(#goldGrad)" stroke-width="2" />
+                        <circle cx="100" cy="100" r="60" fill="none" stroke="url(#goldGrad)" stroke-width="1"
+                            stroke-dasharray="10 5" />
+                        <polygon points="100,10 190,100 100,190 10,100" fill="none" stroke="url(#goldGrad)"
+                            stroke-width="1.5" />
+                        <polygon points="100,25 175,100 100,175 25,100" fill="none" stroke="url(#goldGrad)"
+                            stroke-width="1" transform="rotate(45 100 100)" />
+                        <text x="100" y="105" text-anchor="middle" fill="url(#goldGrad)" font-size="24"
+                            font-family="serif">⚶</text>
+                    </svg>
+                </div>
+
+                <!-- Sacrifice -->
+                <div class="sacrifice-section">
+                    <div class="promo-req" id="sacrReq">SACRIFICE HEROES</div>
+                    <div class="sacrifice-row" id="sacrificeRow"></div>
+                </div>
+
+                <!-- Requirements -->
+                <div class="req-panel" id="reqPanel">
+                    <div class="req-title">SYNTHESIS REQUIREMENTS</div>
+                    <div class="promo-path" id="promoPath">
+                        <div class="star-box" id="fromStar">?★</div>
+                        <div class="arrow">→</div>
+                        <div class="star-box" id="toStar">?★</div>
+                    </div>
+                    <div class="req-item"><span class="req-check fail" id="reqCheck1">✕</span> <span
+                            id="reqText1">Select target hero</span></div>
+                    <div class="req-item"><span class="req-check fail" id="reqCheck2">✕</span> <span id="reqText2">0/0
+                            sacrifice heroes</span></div>
+                    <div class="req-item"><span class="req-check fail" id="reqCheck3">✕</span> <span
+                            id="reqText3">Materials insufficient</span></div>
+                    <div class="skill-unlock" id="skillUnlock" style="display:none">
+                        <div class="label">NEW SKILL UNLOCKED AFTER PROMOTION</div>
+                        <div class="mystery">?</div>
+                    </div>
+                    <div class="warning-text">⚠ Sacrificed heroes are lost forever.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT: HERO SELECTION -->
+        <section class="panel corner-ornament hero-select-panel">
+            <h2 class="panel-title">SELECT HEROES</h2>
+            <div class="tabs">
+                <div class="tab active" data-tab="available">AVAILABLE HEROES</div>
+                <div class="tab" data-tab="selected">ALREADY SELECTED</div>
+            </div>
+            <div class="filter-pills" id="filterPills">
+                <div class="pill active" data-filter="all">ALL</div>
+                <div class="pill" data-filter="5">5★</div>
+                <div class="pill" data-filter="4">4★</div>
+                <div class="pill" data-filter="3">3★</div>
+                <div class="pill" data-filter="2">2★</div>
+                <div class="pill" data-filter="1">1★</div>
+            </div>
+            <div class="hero-grid" id="heroGrid"></div>
+        </section>
+    </main>
+
+    <div class="bottombar">
+        <div class="summary" id="summary">No hero selected for promotion</div>
+        <button class="btn-synthesize" id="synthBtn" disabled>◆ BEGIN SYNTHESIS ◆</button>
+        <button class="btn-reset" id="resetBtn">RESET</button>
+    </div>
+
+    <!-- SYNTHESIS OVERLAY -->
+    <div class="synth-overlay" id="synthOverlay">
+        <div class="synth-burst" id="synthBurst"></div>
+        <svg class="synth-circle" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="#e8c96a" stroke-width="3" stroke-dasharray="10 5" />
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#c9a84c" stroke-width="2" stroke-dasharray="15 8" />
+            <circle cx="100" cy="100" r="50" fill="none" stroke="#e8c96a" stroke-width="1.5" />
+            <polygon points="100,10 190,100 100,190 10,100" fill="none" stroke="#c9a84c" stroke-width="2" />
+        </svg>
+        <div class="synth-text">SYNTHESIZING...</div>
+        <div class="result-card" id="resultCard">
+            <div class="promo-text">PROMOTION COMPLETE</div>
+            <img class="portrait" id="resultPortrait" src="" alt="">
+            <div class="name shimmer-text" id="resultName"></div>
+            <div class="stars" id="resultStars"></div>
+            <div class="new-skill" id="resultSkill"></div>
+            <button class="continue-btn" onclick="closeSynth()">CONTINUE</button>
+        </div>
+    </div>
+
+    <script>
+        // ─── DATA & STATE ───
+        const HEROES = [
+            { id: 'h1', name: 'Demon Chef', star: 5, img: 'heros/5★ Demon Chef.png', skills: ['Flame Cleaver', 'Demon\'s Feast'] },
+            { id: 'h2', name: 'Void Libraria', star: 5, img: 'heros/5★ Void Libraria.png', skills: ['Void Tome', 'Arcane Silence'] },
+            { id: 'h3', name: 'Archmage', star: 4, img: 'heros/4★ Archmage.png', skills: ['Thunder Bolt', 'Mana Shield'] },
+            { id: 'h4', name: 'Paladin', star: 4, img: 'heros/4★ Paladin.png', skills: ['Holy Strike', 'Divine Guard'] },
+            { id: 'h5', name: 'Shadow Assassin', star: 4, img: 'heros/4★ Shadow Assassin.png', skills: ['Shadow Step', 'Backstab'] },
+            { id: 'h6', name: 'Chef (Master)', star: 3, img: 'heros/3★ Chef (Master).png', skills: ['Quick Chop'] },
+            { id: 'h7', name: 'Knight', star: 3, img: 'heros/3★ Knight.png', skills: ['Shield Bash'] },
+            { id: 'h8', name: 'Librarian (Arcane)', star: 3, img: 'heros/3★ Librarian (Arcane).png', skills: ['Book Throw'] },
+            { id: 'h9', name: 'Mage', star: 3, img: 'heros/3★ Mage.png', skills: ['Fireball'] },
+            { id: 'h10', name: 'Apprentice Mage', star: 2, img: 'heros/2★ Apprentice Mage.png', skills: ['Spark'] },
+            { id: 'h11', name: 'Cook (Skilled)', star: 2, img: 'heros/2★ Cook (Skilled).png', skills: ['Boil'] },
+            { id: 'h12', name: 'Scout', star: 2, img: 'heros/2★ Scout.png', skills: ['Arrow Shot'] },
+            { id: 'h13', name: 'Beggar', star: 1, img: 'heros/1★ Beggar.png', skills: ['Beg'] },
+            { id: 'h14', name: 'Farmer', star: 1, img: 'heros/1★ Farmer.png', skills: ['Swing Hoe'] },
+            { id: 'h15', name: 'Fisherman', star: 1, img: 'heros/1★ Fisherman.png', skills: ['Cast Line'] },
+            { id: 'h16', name: 'Grave Digger', star: 1, img: 'heros/1★ Grave Digger.png', skills: ['Dig'] },
+            { id: 'h17', name: 'Librarian', star: 1, img: 'heros/1★ Librarian.png', skills: ['Shelf Reach'] },
+            { id: 'h18', name: 'Maid', star: 1, img: 'heros/1★ Maid.png', skills: ['Clean'] },
+            { id: 'h19', name: 'Merchant', star: 1, img: 'heros/1★ Merchant.png', skills: ['Haggle'] }
+        ];
+
+        const PROMO_RULES = {
+            1: { need: 3, next: 2, stones: 2, mats: 0 },
+            2: { need: 3, next: 3, stones: 5, mats: 1 },
+            3: { need: 4, next: 4, stones: 10, mats: 3 },
+            4: { need: 5, next: 5, stones: 20, mats: 8 }
+        };
+
+        const NEW_SKILLS = {
+            1: 'Swift Strikes', 2: 'Arcane Focus', 3: 'Battle Cry', 4: 'Soul Bind', 5: 'Awakening'
+        };
+
+        const STAR_COLORS = { 1: 'var(--star1)', 2: 'var(--star2)', 3: 'var(--star3)', 4: 'var(--star4)', 5: 'var(--star5)' };
+
+        let state = JSON.parse(localStorage.getItem('synth_state')) || { stones: 24, mats: 8 };
+        let owned = JSON.parse(localStorage.getItem('owned_heroes')) || HEROES;
+        let targetHero = null;
+        let sacrificeHeroes = [];
+        let currentFilter = 'all';
+        let currentTab = 'available';
+
+        // ─── INIT ───
+        function init() {
+            saveState(); updateUI(); renderHeroGrid(); renderSacrificeSlots(); bindEvents();
+        }
+
+        function saveState() {
+            localStorage.setItem('synth_state', JSON.stringify(state));
+            localStorage.setItem('owned_heroes', JSON.stringify(owned));
+        }
+
+        function updateUI() {
+            document.getElementById('stoneCount').textContent = state.stones;
+            document.getElementById('matCount').textContent = state.mats;
+            renderRequirements();
+            updateSummary();
+            updateSynthBtn();
+        }
+
+        // ─── TARGET ───
+        function setTarget(hero) {
+            targetHero = hero;
+            sacrificeHeroes = [];
+            const slot = document.getElementById('targetSlot');
+            slot.classList.add('filled');
+            slot.innerHTML = `
+        <img class="hero-portrait" src="${hero.img}" onerror="this.style.background='var(--star${hero.star})'">
+        <div class="hero-name">${hero.name}</div>
+        <div class="hero-stars" style="color:${STAR_COLORS[hero.star]}">${'★'.repeat(hero.star)}</div>
+        <div class="hero-level">Lv. 1</div>
+        <div class="hero-skills">Skills: ${hero.skills.join(', ')}</div>`;
+            document.getElementById('promoReq').innerHTML = `Requires: <span class="star-highlight">${PROMO_RULES[hero.star]?.need}× ${hero.star}★ heroes</span> to reach ${hero.star + 1}★`;
+            document.getElementById('matCostRow').style.display = 'flex';
+            updateMatCosts();
+            updateUI(); renderHeroGrid(); renderSacrificeSlots();
+        }
+
+        function clearTarget() {
+            if (!targetHero) return;
+            targetHero = null;
+            sacrificeHeroes = [];
+            const slot = document.getElementById('targetSlot');
+            slot.classList.remove('filled');
+            slot.innerHTML = `<div class="empty-icon">+</div><div class="empty-text">SELECT HERO TO PROMOTE</div>`;
+            document.getElementById('promoReq').textContent = 'Select a hero to promote';
+            document.getElementById('matCostRow').style.display = 'none';
+            updateUI(); renderHeroGrid(); renderSacrificeSlots();
+        }
+
+        function updateMatCosts() {
+            if (!targetHero) return;
+            const rule = PROMO_RULES[targetHero.star];
+            if (!rule) return;
+            const sc = document.getElementById('stoneCost');
+            const mc = document.getElementById('matCost');
+            sc.innerHTML = `<div class="icon stone"></div><span>${rule.stones}</span>`;
+            sc.className = `mat-cost-item ${state.stones >= rule.stones ? 'has' : 'missing'}`;
+            mc.innerHTML = `<div class="icon material"></div><span>${rule.mats}</span>`;
+            mc.className = `mat-cost-item ${state.mats >= rule.mats ? 'has' : 'missing'}`;
+        }
+
+        // ─── SACRIFICE ───
+        function addSacrifice(hero) {
+            if (!targetHero) return;
+            if (hero.star !== targetHero.star) return;
+            if (sacrificeHeroes.some(s => s.id === hero.id)) return;
+            if (sacrificeHeroes.length >= PROMO_RULES[targetHero.star].need) return;
+            sacrificeHeroes.push(hero);
+            renderSacrificeSlots(); updateUI(); renderHeroGrid();
+        }
+
+        function removeSacrifice(idx) {
+            sacrificeHeroes.splice(idx, 1);
+            renderSacrificeSlots(); updateUI(); renderHeroGrid();
+        }
+
+        function renderSacrificeSlots() {
+            const row = document.getElementById('sacrificeRow');
+            row.innerHTML = '';
+            const count = targetHero ? PROMO_RULES[targetHero.star].need : 3;
+            for (let i = 0; i < count; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'sacrifice-slot' + (sacrificeHeroes[i] ? ' filled' : '');
+                slot.innerHTML = sacrificeHeroes[i] ?
+                    `<img class="sacr-portrait" src="${sacrificeHeroes[i].img}" onerror="this.style.background='var(--red)'">
+           <div class="sacr-name">${sacrificeHeroes[i].name}</div>
+           <button class="remove-sacr" onclick="removeSacrifice(${i})">×</button>` :
+                    `<div class="skull">💀</div><div class="slot-label">DRAG HERE</div>`;
+                row.appendChild(slot);
+            }
+            document.getElementById('arcaneContainer').classList.toggle('active', sacrificeHeroes.length > 0);
+        }
+
+        // ─── REQUIREMENTS ───
+        function renderRequirements() {
+            const rule = targetHero ? PROMO_RULES[targetHero.star] : null;
+            document.getElementById('fromStar').textContent = targetHero ? `${targetHero.star}★` : '?★';
+            document.getElementById('toStar').textContent = targetHero ? `${targetHero.star + 1}★` : '?★';
+
+            const c1 = document.getElementById('reqCheck1');
+            const t1 = document.getElementById('reqText1');
+            c1.className = `req-check ${targetHero ? 'pass' : 'fail'}`;
+            t1.textContent = targetHero ? `${targetHero.name} (${targetHero.star}★) selected` : 'Select target hero';
+
+            const need = rule ? rule.need : 0;
+            const c2 = document.getElementById('reqCheck2');
+            const t2 = document.getElementById('reqText2');
+            c2.className = `req-check ${sacrificeHeroes.length === need ? 'pass' : 'fail'}`;
+            t2.textContent = `${sacrificeHeroes.length}/${need} sacrifice heroes`;
+
+            const canAfford = rule ? (state.stones >= rule.stones && state.mats >= rule.mats) : false;
+            const c3 = document.getElementById('reqCheck3');
+            const t3 = document.getElementById('reqText3');
+            c3.className = `req-check ${canAfford ? 'pass' : 'fail'}`;
+            t3.textContent = canAfford ? 'Materials sufficient' : `Need ${rule?.stones} stones + ${rule?.mats} mats`;
+
+            document.getElementById('skillUnlock').style.display = targetHero ? 'block' : 'none';
+        }
+
+        function updateSummary() {
+            const el = document.getElementById('summary');
+            el.innerHTML = targetHero ? `Promoting: <span class="highlight">${targetHero.name}</span> to <span class="highlight">${targetHero.star + 1}★</span>` : 'No hero selected for promotion';
+        }
+
+        function updateSynthBtn() {
+            const btn = document.getElementById('synthBtn');
+            const rule = targetHero ? PROMO_RULES[targetHero.star] : null;
+            const ready = targetHero && sacrificeHeroes.length === rule?.need && state.stones >= rule.stones && state.mats >= rule.mats;
+            btn.disabled = !ready;
+            btn.classList.toggle('ready', ready);
+        }
+
+        // ─── HERO GRID ───
+        function renderHeroGrid() {
+            const grid = document.getElementById('heroGrid');
+            grid.innerHTML = '';
+
+            let heroes = currentTab === 'available' ? owned : [...(targetHero ? [targetHero] : []), ...sacrificeHeroes];
+
+            if (currentFilter !== 'all' && currentTab === 'available') {
+                heroes = heroes.filter(h => h.star === parseInt(currentFilter));
+            }
+
+            heroes.forEach(h => {
+                const card = document.createElement('div');
+                card.className = 'hero-card';
+                if (targetHero && targetHero.id === h.id) card.classList.add('selected-target');
+                if (sacrificeHeroes.some(s => s.id === h.id)) card.classList.add('selected-sacrifice');
+
+                card.innerHTML = `
+          <img class="portrait" src="${h.img}" onerror="this.style.background='var(--star${h.star})'">
+          <div class="info">
+            <div class="name">${h.name}</div>
+            <div class="stars" style="color:${STAR_COLORS[h.star]}">${'★'.repeat(h.star)}</div>
+            <div class="level">Lv. 1</div>
+          </div>`;
+
+                card.onclick = () => {
+                    if (targetHero && targetHero.id === h.id) return;
+                    if (sacrificeHeroes.some(s => s.id === h.id)) return;
+                    if (!targetHero) setTarget(h);
+                    else addSacrifice(h);
+                };
+                grid.appendChild(card);
+            });
+        }
+
+        // ─── SYNTHESIS ───
+        function beginSynthesis() {
+            const rule = PROMO_RULES[targetHero.star];
+            if (!rule || sacrificeHeroes.length !== rule.need) return;
+
+            // Deduct materials
+            state.stones -= rule.stones;
+            state.mats -= rule.mats;
+
+            // Show overlay
+            const overlay = document.getElementById('synthOverlay');
+            overlay.classList.add('active');
+            document.getElementById('resultCard').classList.remove('show');
+            document.getElementById('synthBurst').classList.remove('active');
+
+            setTimeout(() => {
+                document.getElementById('synthBurst').classList.add('active');
+            }, 2500);
+
+            setTimeout(() => {
+                const nextStar = targetHero.star + 1;
+                document.getElementById('resultPortrait').src = getPromotedImg(nextStar, targetHero.name);
+                document.getElementById('resultName').textContent = targetHero.name;
+                document.getElementById('resultStars').innerHTML = `<span style="color:${STAR_COLORS[nextStar]}">${'★'.repeat(nextStar)}</span>`;
+                document.getElementById('resultSkill').textContent = `NEW SKILL: ${NEW_SKILLS[nextStar] || 'Awakened Power'}`;
+                document.getElementById('resultCard').classList.add('show');
+
+                // Update hero data
+                targetHero.star = nextStar;
+                targetHero.skills = [...(targetHero.skills || []), NEW_SKILLS[nextStar] || 'Awakened Power'];
+                sacrificeHeroes.forEach(s => {
+                    owned = owned.filter(o => o.id !== s.id);
+                });
+                owned = owned.map(o => o.id === targetHero.id ? targetHero : o);
+
+                saveState(); updateUI(); renderHeroGrid();
+            }, 3200);
+        }
+
+        function getPromotedImg(star, name) {
+            // Find matching promoted image
+            return owned.find(h => h.star === star && h.name.includes(name.split(' ')[0]))?.img || `heros/${star}★ ${name.split(' ')[0]}.png`;
+        }
+
+        function closeSynth() {
+            document.getElementById('synthOverlay').classList.remove('active');
+            document.getElementById('resultCard').classList.remove('show');
+            clearTarget();
+        }
+
+        // ─── EVENTS ───
+        function bindEvents() {
+            document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+                document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+                t.classList.add('active');
+                currentTab = t.dataset.tab;
+                renderHeroGrid();
+            });
+
+            document.querySelectorAll('.pill').forEach(p => p.onclick = () => {
+                document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
+                p.classList.add('active');
+                currentFilter = p.dataset.filter;
+                renderHeroGrid();
+            });
+
+            document.getElementById('synthBtn').onclick = beginSynthesis;
+            document.getElementById('resetBtn').onclick = () => { clearTarget(); };
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

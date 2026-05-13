@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pick Me Up — Facilities</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-bright: #e8c96a;
+            --gold-dim: #7a5f28;
+            --gold-glow: rgba(201, 168, 76, 0.3);
+            --star5: #ffd700;
+            --star4: #c080ff;
+            --star3: #60a0ff;
+            --star2: #60ff80;
+            --star1: #aaaaaa;
+            --red: #cc2222;
+            --purple: #7c3fb0;
+            --dark: #06060e;
+            --panel: rgba(8, 6, 18, 0.82);
+            --panel-solid: rgba(10, 8, 22, 0.95);
+            --border: rgba(201, 168, 76, 0.25);
+            --border-bright: rgba(201, 168, 76, 0.6);
+            --text: #e8e0d0;
+            --text-muted: #7a6f5a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: var(--dark);
+            color: var(--text);
+        }
+
+        .global-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: url('images/summon-bg.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .global-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(4, 4, 14, 0.65);
+            pointer-events: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-dim);
+            border-radius: 4px;
+        }
+
+        .cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        .crimson {
+            font-family: 'Crimson Text', serif;
+        }
+
+        .topbar {
+            position: relative;
+            z-index: 10;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            backdrop-filter: blur(14px);
+            background: rgba(4, 4, 14, 0.92);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+
+        .topbar .back-btn:hover {
+            color: var(--gold-bright);
+        }
+
+        .topbar .title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .topbar .resources {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .res-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .res-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .main-layout {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 16px;
+            padding: 16px;
+            height: calc(100% - 60px - 60px);
+        }
+
+        .panel {
+            background: var(--panel);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .corner-ornament::before,
+        .corner-ornament::after {
+            content: '';
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            border: 2px solid var(--gold);
+            pointer-events: none;
+        }
+
+        .corner-ornament::before {
+            top: 4px;
+            left: 4px;
+            border-right: 0;
+            border-bottom: 0;
+        }
+
+        .corner-ornament::after {
+            bottom: 4px;
+            right: 4px;
+            border-left: 0;
+            border-top: 0;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--gold);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+        }
+
+        /* Facility List */
+        .facility-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .facility-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.25s;
+            position: relative;
+        }
+
+        .facility-card:hover {
+            background: rgba(201, 168, 76, 0.08);
+            transform: translateX(4px);
+        }
+
+        .facility-card.selected {
+            border-color: var(--gold);
+            background: rgba(201, 168, 76, 0.12);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .facility-card.locked {
+            opacity: 0.5;
+            filter: grayscale(0.8);
+            pointer-events: none;
+        }
+
+        .facility-card .icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            border: 1px solid var(--border);
+        }
+
+        .facility-card .info {
+            flex: 1;
+        }
+
+        .facility-card .name {
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .facility-card .level-badge {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .facility-card .lock-overlay {
+            position: absolute;
+            right: 8px;
+            font-size: 1rem;
+            opacity: 0.6;
+        }
+
+        /* Detail Panel */
+        .detail-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .detail-header {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .detail-header .big-icon {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 20px var(--gold-glow);
+        }
+
+        .detail-header .title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            color: var(--gold-bright);
+            margin-bottom: 4px;
+        }
+
+        .detail-header .desc {
+            font-style: italic;
+            color: var(--text-muted);
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        .level-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 10px 0;
+        }
+
+        .level-ring {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+
+        .level-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .level-ring circle {
+            fill: none;
+            stroke-width: 4;
+        }
+
+        .level-ring .bg {
+            stroke: rgba(255, 255, 255, 0.1);
+        }
+
+        .level-ring .fill {
+            stroke: var(--gold);
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s;
+        }
+
+        .level-ring .text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--gold-bright);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-family: 'Cinzel', serif;
+        }
+
+        .stat-current {
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .stat-next {
+            font-size: 0.8rem;
+            color: var(--gold-bright);
+            margin-top: 2px;
+        }
+
+        .cost-section {
+            margin-top: 12px;
+        }
+
+        .cost-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .cost-row:last-child {
+            border: 0;
+        }
+
+        .cost-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cost-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .cost-icon.gold {
+            background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+        }
+
+        .cost-icon.gem {
+            background: linear-gradient(135deg, var(--purple), #9b4dca);
+        }
+
+        .cost-icon.mat {
+            background: linear-gradient(135deg, var(--star3), #4a80ff);
+        }
+
+        .cost-val {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+        }
+
+        .cost-check {
+            font-size: 1rem;
+        }
+
+        .cost-check.pass {
+            color: var(--star2);
+        }
+
+        .cost-check.fail {
+            color: var(--red);
+        }
+
+        .upgrade-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 16px;
+            background: linear-gradient(to bottom, var(--gold-bright), var(--gold-dim));
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            color: #1a1005;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .upgrade-btn.ready {
+            animation: btn-pulse 2s infinite;
+            box-shadow: 0 0 20px var(--gold-glow);
+        }
+
+        @keyframes btn-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px var(--gold-glow);
+            }
+
+            50% {
+                box-shadow: 0 0 30px var(--gold);
+            }
+        }
+
+        .upgrade-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            animation: none;
+        }
+
+        .effect-list {
+            margin-top: 12px;
+        }
+
+        .effect-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .effect-item::before {
+            content: '◆';
+            color: var(--gold);
+            font-size: 0.6rem;
+        }
+
+        /* Bottom Bar */
+        .bottombar {
+            position: relative;
+            z-index: 10;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 20px;
+            gap: 12px;
+            backdrop-filter: blur(14px);
+            background: rgba(4, 4, 14, 0.92);
+            border-top: 1px solid var(--border);
+        }
+
+        .yield-box {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .yield-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-family: 'Cinzel', serif;
+        }
+
+        .yield-val {
+            font-size: 1rem;
+            color: var(--gold-bright);
+            font-weight: 600;
+        }
+
+        .yield-timer {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        /* Upgrade Overlay */
+        .upgrade-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--panel-solid);
+            backdrop-filter: blur(16px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upgrade-overlay.active {
+            display: flex;
+        }
+
+        .upgrade-circle {
+            width: 120px;
+            height: 120px;
+            animation: spin-up 2s linear infinite;
+        }
+
+        @keyframes spin-up {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .upgrade-text {
+            margin-top: 16px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        .upgrade-burst {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, var(--gold-bright), transparent 60%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+        }
+
+        .upgrade-burst.flash {
+            opacity: 0.8;
+        }
+
+        .upgrade-success {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0;
+            transition: 0.5s;
+            text-align: center;
+        }
+
+        .upgrade-success.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .success-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: var(--star5);
+            text-shadow: 0 0 20px var(--gold-glow);
+        }
+
+        .success-sub {
+            color: var(--text-muted);
+            margin: 8px 0 16px;
+        }
+
+        .continue-btn {
+            padding: 10px 24px;
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+            border-radius: 6px;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+                height: auto;
+                padding-bottom: 80px;
+            }
+
+            .panel {
+                min-height: 400px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="global-bg"></div>
+
+    <header class="topbar">
+        <div class="back-btn" onclick="location.href='index.html'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back
+        </div>
+        <div class="title">◆ FACILITIES ◆</div>
+        <div class="resources">
+            <div class="res-item">
+                <div class="res-icon" style="background:#e8c96a"></div><span id="goldDisp">0</span>
+            </div>
+            <div class="res-item">
+                <div class="res-icon" style="background:#9b4dca"></div><span id="gemDisp">0</span>
+            </div>
+            <div class="res-item">
+                <div class="res-icon" style="background:#60a0ff"></div><span id="matDisp">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-layout">
+        <section class="panel corner-ornament">
+            <h2 class="panel-title">DOMAIN FACILITIES</h2>
+            <div class="facility-list" id="facilityList"></div>
+        </section>
+
+        <section class="panel corner-ornament">
+            <div class="detail-scroll" id="detailScroll">
+                <div class="detail-header">
+                    <div class="big-icon" id="dIcon">👑</div>
+                    <div class="title" id="dTitle">Throne of Moebius</div>
+                    <div class="desc" id="dDesc">The heart of your domain. Amplifies all base attributes and unlocks
+                        higher facility tiers.</div>
+                </div>
+
+                <div class="level-progress">
+                    <div class="level-ring">
+                        <svg viewBox="0 0 60 60">
+                            <circle class="bg" cx="30" cy="30" r="24"></circle>
+                            <circle class="fill" cx="30" cy="30" r="24" stroke-dasharray="150.8"
+                                stroke-dashoffset="100"></circle>
+                        </svg>
+                        <div class="text" id="dLevel">Lv 1</div>
+                    </div>
+                    <div style="flex:1">
+                        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Next Level Progress
+                        </div>
+                        <div style="height:8px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+                            <div
+                                style="height:100%;width:65%;background:linear-gradient(90deg,var(--gold-dim),var(--gold-bright));">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid" id="statsGrid"></div>
+
+                <div class="cost-section">
+                    <div style="font-family:'Cinzel',serif;font-size:0.9rem;color:var(--gold);margin-bottom:8px;">
+                        UPGRADE COST</div>
+                    <div id="costRows"></div>
+                </div>
+
+                <div class="effect-list" id="effectList"></div>
+
+                <button class="upgrade-btn" id="upgradeBtn" disabled>UPGRADE FACILITY</button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bottombar">
+        <div class="yield-box">
+            <div class="yield-label">DAILY YIELD</div>
+            <div class="yield-val" id="yieldGold">+2,400 Gold</div>
+            <div class="yield-timer">Next: 04:32:10</div>
+        </div>
+        <div class="yield-box">
+            <div class="yield-label">BUFFS ACTIVE</div>
+            <div class="yield-val" id="buffCount">3</div>
+            <div class="yield-timer">Global Multiplier</div>
+        </div>
+        <div class="yield-box">
+            <div class="yield-label">DOMAIN POWER</div>
+            <div class="yield-val" id="domainPower">1,240</div>
+            <div class="yield-timer">Base + Facility</div>
+        </div>
+    </footer>
+
+    <div class="upgrade-overlay" id="upgradeOverlay">
+        <div class="upgrade-burst" id="upgradeBurst"></div>
+        <svg class="upgrade-circle" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--gold)" stroke-width="3" stroke-dasharray="10 5" />
+            <circle cx="60" cy="60" r="40" fill="none" stroke="var(--gold-bright)" stroke-width="2"
+                stroke-dasharray="15 8" />
+            <polygon points="60,10 110,60 60,110 10,60" fill="none" stroke="var(--gold)" stroke-width="2" />
+        </svg>
+        <div class="upgrade-text">CONSTRUCTING...</div>
+        <div class="upgrade-success" id="upgradeSuccess">
+            <div class="success-title">UPGRADE COMPLETE</div>
+            <div class="success-sub" id="successSub">Throne of Moebius → Lv 2</div>
+            <button class="continue-btn" onclick="closeUpgrade()">CONTINUE</button>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'facilities_state';
+        const RES_KEY = 'player_res';
+        let res = JSON.parse(localStorage.getItem(RES_KEY)) || { gold: 150000, gems: 4500, mats: 28, floor: 47 };
+
+        const FACILITY_DATA = [
+            { id: 'throne', name: 'Throne of Moebius', icon: '👑', desc: 'The heart of your domain. Amplifies all base attributes and unlocks higher facility tiers.', baseCost: { gold: 5000, gems: 100, mats: 5 }, maxLvl: 10, effects: ['Global Power +{n}%', 'Unlock Facility Cap +{n}'] },
+            { id: 'barracks', name: 'Barracks of the Fallen', icon: '⚔️', desc: 'Houses summoned warriors. Expands capacity and accelerates stamina regeneration.', baseCost: { gold: 2000, gems: 50, mats: 3 }, reqFloor: 10, maxLvl: 8, effects: ['Hero Cap +{n}', 'Stamina Regen +{n}/hr'] },
+            { id: 'forge', name: 'Forge of Embers', icon: '🔥', desc: 'Smelts ancient metals. Generates passive gold and improves equipment drop rates.', baseCost: { gold: 2500, gems: 75, mats: 4 }, reqFloor: 15, maxLvl: 8, effects: ['Passive Gold +{n}/hr', 'Weapon Drop +{n}%'] },
+            { id: 'archive', name: 'Archive of Whispers', icon: '📜', desc: 'Stores forbidden knowledge. Boosts hero experience gain and skill acquisition.', baseCost: { gold: 3000, gems: 80, mats: 6 }, reqFloor: 25, maxLvl: 8, effects: ['EXP Gain +{n}%', 'Skill Unlock +{n}%'] },
+            { id: 'altar', name: 'Altar of the Veil', icon: '🔮', desc: 'Communes with the beyond. Enhances summoning efficiency and pity thresholds.', baseCost: { gold: 4000, gems: 120, mats: 8 }, reqFloor: 35, maxLvl: 8, effects: ['5★ Rate +{n}%', 'Pity -{n} pulls'] }
+        ];
+
+        let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        FACILITY_DATA.forEach(f => { if (!state[f.id]) state[f.id] = { level: 0 }; });
+
+        let selectedId = 'throne';
+
+        function saveAll() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            localStorage.setItem(RES_KEY, JSON.stringify(res));
+        }
+
+        function fmt(n) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n; }
+
+        function updateResUI() {
+            document.getElementById('goldDisp').textContent = fmt(res.gold);
+            document.getElementById('gemDisp').textContent = fmt(res.gems);
+            document.getElementById('matDisp').textContent = fmt(res.mats);
+        }
+
+        function getCost(f, lvl) {
+            const c = f.baseCost;
+            return {
+                gold: Math.floor(c.gold * Math.pow(1.6, lvl)),
+                gems: Math.floor(c.gems * Math.pow(1.4, lvl)),
+                mats: Math.floor(c.mats * Math.pow(1.2, lvl))
+            };
+        }
+
+        function renderList() {
+            const list = document.getElementById('facilityList'); list.innerHTML = '';
+            FACILITY_DATA.forEach(f => {
+                const s = state[f.id].level;
+                const locked = res.floor < (f.reqFloor || 0);
+                const card = document.createElement('div');
+                card.className = `facility-card ${locked ? 'locked' : ''} ${selectedId === f.id ? 'selected' : ''}`;
+                card.innerHTML = `
+          <div class="icon">${f.icon}</div>
+          <div class="info"><div class="name">${f.name}</div><div class="level-badge">Lv ${s} / ${f.maxLvl}</div></div>
+          ${locked ? '<div class="lock-overlay">🔒 F' + f.reqFloor + '</div>' : ''}`;
+                if (!locked) card.onclick = () => selectFacility(f.id);
+                list.appendChild(card);
+            });
+        }
+
+        function selectFacility(id) {
+            selectedId = id; renderList(); renderDetail();
+        }
+
+        function renderDetail() {
+            const f = FACILITY_DATA.find(x => x.id === selectedId);
+            const s = state[f.id].level;
+            const cost = getCost(f, s);
+            const maxed = s >= f.maxLvl;
+
+            document.getElementById('dIcon').textContent = f.icon;
+            document.getElementById('dTitle').textContent = f.name;
+            document.getElementById('dDesc').textContent = f.desc;
+            document.getElementById('dLevel').textContent = maxed ? 'MAX' : `Lv ${s}`;
+
+            const pct = maxed ? 100 : Math.min(((s * 150.8) / 150.8), 150.8);
+            document.querySelector('.level-ring .fill').style.strokeDashoffset = maxed ? 0 : 150.8 - (pct * (s / f.maxLvl));
+
+            // Stats
+            const stats = document.getElementById('statsGrid');
+            stats.innerHTML = '';
+            f.effects.forEach((e, i) => {
+                const val = (i + 1) * (maxed ? s : s + 1);
+                stats.innerHTML += `<div class="stat-box"><div class="stat-label">${e.replace('{n}', 'X')}</div><div class="stat-current">+${(i + 1) * s}%</div>${!maxed ? `<div class="stat-next">→ +${(i + 1) * (s + 1)}%</div>` : ''}</div>`;
+            });
+
+            // Costs
+            const costs = document.getElementById('costRows');
+            costs.innerHTML = '';
+            if (maxed) {
+                costs.innerHTML = '<div style="padding:8px 0;color:var(--text-muted);text-align:center;">Maximum Level Reached</div>';
+            } else {
+                const checks = [
+                    { icon: 'gold', name: 'Gold', have: res.gold, need: cost.gold },
+                    { icon: 'gem', name: 'Gems', have: res.gems, need: cost.gems },
+                    { icon: 'mat', name: 'Materials', have: res.mats, need: cost.mats }
+                ];
+                checks.forEach(c => {
+                    const pass = c.have >= c.need;
+                    costs.innerHTML += `
+            <div class="cost-row">
+              <div class="cost-item"><div class="cost-icon ${c.icon}"></div><span>${c.name}</span></div>
+              <div class="cost-val">${pass ? '' : '❌ '}${fmt(c.need)}</div>
+              <div class="cost-check ${pass ? 'pass' : 'fail'}">${pass ? '✓' : '✕'}</div>
+            </div>`;
+                });
+            }
+
+            // Effects list
+            const effList = document.getElementById('effectList');
+            effList.innerHTML = '<div style="font-family:\'Cinzel\',serif;font-size:0.9rem;color:var(--gold);margin-bottom:8px;">ACTIVE BUFFS</div>';
+            f.effects.forEach(e => {
+                const val = (e.includes('{n}') ? (Math.floor(Math.random() * 3) + 1) * (s || 1) : '');
+                effList.innerHTML += `<div class="effect-item">${e.replace('{n}', val)}</div>`;
+            });
+
+            const btn = document.getElementById('upgradeBtn');
+            btn.disabled = maxed || cost.gold > res.gold || cost.gems > res.gems || cost.mats > res.mats;
+            btn.textContent = maxed ? 'MAX LEVEL' : `UPGRADE TO LV ${s + 1}`;
+            btn.className = `upgrade-btn ${!btn.disabled ? 'ready' : ''}`;
+        }
+
+        function startUpgrade() {
+            const f = FACILITY_DATA.find(x => x.id === selectedId);
+            const s = state[f.id].level;
+            const cost = getCost(f, s);
+            if (res.gold < cost.gold || res.gems < cost.gems || res.mats < cost.mats || s >= f.maxLvl) return;
+
+            res.gold -= cost.gold; res.gems -= cost.gems; res.mats -= cost.mats;
+            saveAll(); updateResUI();
+
+            const ov = document.getElementById('upgradeOverlay'); ov.classList.add('active');
+            document.getElementById('upgradeBurst').classList.remove('flash');
+            document.getElementById('upgradeSuccess').classList.remove('show');
+
+            setTimeout(() => {
+                document.getElementById('upgradeBurst').classList.add('flash');
+            }, 1200);
+
+            setTimeout(() => {
+                state[f.id].level++;
+                saveAll(); renderList(); renderDetail();
+                document.getElementById('successSub').textContent = `${f.name} → Lv ${state[f.id].level}`;
+                document.getElementById('upgradeSuccess').classList.add('show');
+            }, 1800);
+        }
+
+        function closeUpgrade() { document.getElementById('upgradeOverlay').classList.remove('active'); }
+
+        function bindEvents() {
+            document.getElementById('upgradeBtn').onclick = startUpgrade;
+        }
+
+        function init() {
+            updateResUI(); renderList(); selectFacility('throne'); bindEvents();
+            // Simulate hourly passive yield
+            setInterval(() => {
+                const forgeLvl = state['forge']?.level || 0;
+                res.gold += 200 * forgeLvl; res.mats += forgeLvl > 0 ? 1 : 0;
+                saveAll(); updateResUI();
+            }, 60000);
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
